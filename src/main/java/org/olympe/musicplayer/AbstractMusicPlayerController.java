@@ -29,7 +29,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.HashMap;
@@ -57,12 +56,9 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
             }
         }
     };
-    private ChangeListener<Duration> totalTimeChangeListener = new ChangeListener<Duration>() {
-        @Override
-        public void changed(ObservableValue<? extends Duration> observable, Duration oldValue, Duration newValue) {
-            if (newValue != null) {
-                totalTime.set((long) newValue.toMillis());
-            }
+    private ChangeListener<Duration> totalTimeChangeListener = (observable, oldValue, newValue) -> {
+        if (newValue != null) {
+            totalTime.set((long) newValue.toMillis());
         }
     };
     private ObjectProperty<Image> coverImage = new SimpleObjectProperty<>();
@@ -138,7 +134,8 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
                                         if (color == null) {
                                             BufferedImage bImg = ImageIO.read(new ByteArrayInputStream(data));
                                             int[] rgb = ColorThief.getColor(bImg);
-                                            color = new Color(rgb[0] / 255.0, rgb[1] / 255.0, rgb[2] / 255.0, 1.0);
+                                            if (rgb != null)
+                                                color = new Color(rgb[0] / 255.0, rgb[1] / 255.0, rgb[2] / 255.0, 1.0);
                                             predominantColorsCache.put(img, color);
                                         }
                                     }
@@ -153,7 +150,8 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
                                         if (color == null) {
                                             BufferedImage bImg = ImageIO.read(new URL(url));
                                             int[] rgb = ColorThief.getColor(bImg);
-                                            color = new Color(rgb[0] / 255.0, rgb[1] / 255.0, rgb[2] / 255.0, 0.0);
+                                            if (rgb != null)
+                                                color = new Color(rgb[0] / 255.0, rgb[1] / 255.0, rgb[2] / 255.0, 0.0);
                                             predominantColorsCache.put(img, color);
                                         }
                                     }
@@ -164,23 +162,14 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
                                 if (color == null) {
                                     BufferedImage bImg = ImageIO.read(new URL(EMPTY_COVER_IMAGE_URL));
                                     int[] rgb = ColorThief.getColor(bImg);
-                                    color = new Color(rgb[0] / 255.0, rgb[1] / 255.0, rgb[2] / 255.0, 0.0);
+                                    if (rgb != null)
+                                        color = new Color(rgb[0] / 255.0, rgb[1] / 255.0, rgb[2] / 255.0, 0.0);
                                     predominantColorsCache.put(img, color);
                                 }
                             }
                             coversMap.put(player, img);
-                        } catch (MalformedURLException e) {
+                        } catch (IOException | CannotReadException | TagException | ReadOnlyFileException | InvalidAudioFrameException e) {
                             // TODO
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (CannotReadException e) {
-                            e.printStackTrace();
-                        } catch (ReadOnlyFileException e) {
-                            e.printStackTrace();
-                        } catch (TagException e) {
-                            e.printStackTrace();
-                        } catch (InvalidAudioFrameException e) {
-                            e.printStackTrace();
                         }
                     }
                 } else if (c.wasRemoved()) {
