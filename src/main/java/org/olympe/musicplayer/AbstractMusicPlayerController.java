@@ -102,7 +102,7 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
             mediaPlayers.values().forEach(mediaPlayer -> mediaPlayer.setMute(get()));
         }
     };
-    private static final String EMPTY_COVER_IMAGE_URL = "http://365psd.com/images/premium/thumbs/132/gold-vinyl-music-award-196805.jpg";
+    private static final String EMPTY_COVER_IMAGE_URL = "https://image.freepik.com/free-icon/music-cd_318-48567.png";
     private final Image emptyCoverImage = new Image(EMPTY_COVER_IMAGE_URL);
     private Map<Image, Color> predominantColorsCache = new HashMap<>();
 
@@ -117,6 +117,8 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
                             String url = file.toURI().toURL().toExternalForm();
                             Media media = new Media(url);
                             MediaPlayer player = new MediaPlayer(media);
+                            player.setVolume(volume.get());
+                            player.setMute(mute.get());
                             player.setOnEndOfMedia(() -> gotoTrack(+1));
                             mediaPlayers.put(file, player);
                             AudioFile audioFile = AudioFileIO.read(file);

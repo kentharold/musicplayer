@@ -147,6 +147,11 @@ public class FXMLControllerWrapper {
     }
 
     @FXML
+    void toggleFullScreen() {
+        stage.setFullScreen(!stage.isFullScreen());
+    }
+
+    @FXML
     void onDragDetected(MouseEvent event) {
 
     }
