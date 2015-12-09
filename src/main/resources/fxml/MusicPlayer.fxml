@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import de.jensd.fx.glyphs.materialdesignicons.*?>
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import org.controlsfx.control.cell.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.geometry.*?>
+<?import org.controlsfx.control.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<VBox xmlns="http://javafx.com/javafx/8.0.66" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <StackPane VBox.vgrow="ALWAYS">
+         <children>
+            <BorderPane>
+               <center>
+                  <ImageView fx:id="coverView" pickOnBounds="true" />
+               </center>
+            </BorderPane>
+            <VBox onDragDetected="#onDragDetected" onDragDone="#onDragDone" onDragDropped="#onDragDropped" onDragEntered="#onDragEntered" onDragExited="#onDragExited" onDragOver="#onDragOver">
+               <children>
+                  <HBox alignment="CENTER_LEFT" onMouseDragged="#moveWindow" onMousePressed="#startDragWindow">
+                     <children>
+                        <Button layoutX="457.0" layoutY="15.0" mnemonicParsing="false" styleClass="control-button" text="Options">
+                           <graphic>
+                              <FontAwesomeIconView glyphName="COG" />
+                           </graphic>
+                        </Button>
+                        <Button layoutX="15.0" layoutY="15.0" mnemonicParsing="false" styleClass="control-button" text="Info">
+                           <graphic>
+                              <FontAwesomeIconView glyphName="INFO_CIRCLE" />
+                           </graphic>
+                        </Button>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label text="Music Player">
+                           <graphic>
+                              <FontAwesomeIconView glyphName="MUSIC" size="16" />
+                           </graphic>
+                        </Label>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button mnemonicParsing="false" onAction="#hideWindow" styleClass="control-button" text="Minimize">
+                           <graphic>
+                              <FontAwesomeIconView glyphName="MINUS_CIRCLE" />
+                           </graphic>
+                        </Button>
+                        <Button layoutX="489.0" layoutY="15.0" mnemonicParsing="false" onAction="#quitApplication" styleClass="control-button" text="Close">
+                           <graphic>
+                              <FontAwesomeIconView glyphName="TIMES_CIRCLE" />
+                           </graphic>
+                        </Button>
+                     </children>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                  </HBox>
+                  <Separator prefWidth="200.0" />
+                  <StackPane fx:id="root" VBox.vgrow="ALWAYS">
+                     <children>
+                        <StackPane fx:id="backgroundPane" />
+                        <VBox spacing="20.0">
+                           <children>
+                              <HBox id="mainArea" spacing="20.0" VBox.vgrow="ALWAYS">
+                                 <children>
+                                    <StackPane styleClass="container" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Region styleClass="container-bg" />
+                                          <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" />
+                                       </children>
+                                    </StackPane>
+                                    <StackPane styleClass="container" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Region styleClass="container-bg" />
+                                          <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0">
+                                             <children>
+                                                <HBox alignment="CENTER">
+                                                   <children>
+                                                      <Label contentDisplay="RIGHT" text="Play Queue">
+                                                         <graphic>
+                                                            <Button mnemonicParsing="false" styleClass="control-button" text="Add">
+                                                               <graphic>
+                                                                  <FontAwesomeIconView glyphName="PLUS_SQUARE" />
+                                                               </graphic>
+                                                            </Button>
+                                                         </graphic>
+                                                      </Label>
+                                                   </children>
+                                                </HBox>
+                                                <ListView fx:id="musicFilesView" VBox.vgrow="ALWAYS" />
+                                             </children>
+                                             <padding>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                             </padding>
+                                          </VBox>
+                                       </children>
+                                    </StackPane>
+                                 </children>
+                              </HBox>
+                              <StackPane styleClass="container">
+                                 <children>
+                                    <Region styleClass="container-bg" />
+                                    <HBox id="control-area" alignment="CENTER_LEFT">
+                                       <children>
+                                          <Button fx:id="prevTrackBtn" mnemonicParsing="false" onAction="#playPrevTrack" styleClass="control-button" text="Prev.">
+                                             <graphic>
+                                                <FontAwesomeIconView glyphName="STEP_BACKWARD" />
+                                             </graphic>
+                                          </Button>
+                                          <ToggleButton id="play-button" fx:id="playPauseBtn" mnemonicParsing="false" onAction="#togglePlayPause" styleClass="control-button" text="Play/Pause">
+                                             <graphic>
+                                                <FontAwesomeIconView glyphName="PLAY_CIRCLE" />
+                                             </graphic>
+                                          </ToggleButton>
+                                          <Button fx:id="nextTractBtn" layoutX="62.0" layoutY="10.0" mnemonicParsing="false" onAction="#playNextTrack" styleClass="control-button" text="Next">
+                                             <graphic>
+                                                <FontAwesomeIconView glyphName="STEP_FORWARD" />
+                                             </graphic>
+                                          </Button>
+                                          <HBox alignment="CENTER" spacing="5.0" HBox.hgrow="ALWAYS">
+                                             <children>
+                                                <Label fx:id="currentTimeLbl" />
+                                                <Slider fx:id="durationSlider" HBox.hgrow="ALWAYS" />
+                                                <Label fx:id="totalTimeLbl" layoutX="10.0" layoutY="24.0" />
+                                             </children>
+                                          </HBox>
+                                          <ToggleButton id="volume-button" fx:id="muteToggleBtn" mnemonicParsing="false" styleClass="control-button" text="Mute">
+                                             <graphic>
+                                                <MaterialDesignIconView />
+                                             </graphic>
+                                          </ToggleButton>
+                                          <Slider fx:id="volumeSlider" blockIncrement="0.1" max="1.0" />
+                                          <CheckBox id="repeat-checkbox" fx:id="repeatToggleBtn" allowIndeterminate="true" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" onAction="#toggleRepeat" text="Repeat">
+                                             <graphic>
+                                                <MaterialDesignIconView />
+                                             </graphic>
+                                             <styleClass>
+                                                <String fx:value="control-button" />
+                                                <String fx:value="control-checkbox" />
+                                             </styleClass>
+                                          </CheckBox>
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                       </padding>
+                                    </HBox>
+                                 </children>
+                              </StackPane>
+                           </children>
+                           <padding>
+                              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                           </padding>
+                        </VBox>
+                        <StackPane fx:id="overlayPane" layoutX="10.0" layoutY="10.0" visible="false" />
+                     </children>
+                  </StackPane>
+               </children>
+            </VBox>
+         </children>
+      </StackPane>
+   </children>
+</VBox>

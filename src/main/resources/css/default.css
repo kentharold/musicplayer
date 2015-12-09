@@ -1,0 +1,99 @@
+.root {
+    -fx-base: #deaddc;
+    -fx-background: derive(-fx-base, 10%);
+    -fx-focus-color: derive(-fx-base, 50%);
+    -fx-background-image: url("../gfx/pattern.jpg");
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: stretch;
+}
+
+.control-button {
+    -fx-content-display: graphic-only;
+    -fx-background-color: none;
+}
+
+.control-button .glyph-icon {
+    -glyph-size: 16px;
+    -fx-fill: derive(-fx-base, -50%);
+}
+
+.control-button:hover .glyph-icon {
+    -fx-stroke: -fx-focus-color;
+}
+
+.control-button:armed .glyph-icon {
+    -fx-fill: derive(-fx-base, -10%);
+}
+
+.control-checkbox .box {
+    visibility: false;
+}
+
+#play-button .glyph-icon {
+    -glyph-size: 32px;
+    -glyph-name: PLAY_CIRCLE;
+}
+
+#play-button:selected .glyph-icon {
+    -glyph-name: PAUSE_CIRCLE;
+}
+
+#volume-button .glyph-icon {
+    -glyph-name: VOLUME_OFF;
+}
+
+#volume-button:selected .glyph-icon {
+    -glyph-name: VOLUME_HIGH;
+}
+
+#repeat-checkbox .glyph-icon {
+    -glyph-name: REPEAT_OFF;
+}
+
+#repeat-checkbox:selected .glyph-icon {
+    -glyph-name: REPEAT_ONCE;
+}
+
+#repeat-checkbox:indeterminate .glyph-icon {
+    -glyph-name: REPEAT;
+}
+
+#shuffle-button .glyph-icon {
+    -glyph-name: SHUFFLE;
+}
+
+#shuffle-button:selected .glyph-icon {
+    -glyph-name: SHUFFLE;
+}
+
+.container {
+}
+
+.container .container-bg {
+    -fx-opacity: 30%;
+    -fx-background-color: derive(-fx-background, 85%);
+    -fx-background-radius: 10;
+}
+
+.label, .label .glyph-icon {
+    -fx-text-fill: derive(-fx-base, -50%);
+    -fx-fill: derive(-fx-base, -50%);
+}
+
+.list-view {
+    -fx-background-color: none;
+}
+
+.list-cell {
+    -fx-background-color: none;
+    -fx-text-fill: derive(-fx-base, -50%);
+}
+
+.scroll-bar {
+    -fx-background-color: none;
+}
+
+.scroll-bar .decrement-button, .scroll-bar .increment-button {
+    visibility: hidden;
+}
