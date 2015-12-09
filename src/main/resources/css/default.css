@@ -1,5 +1,6 @@
 .root {
     -fx-base: #deaddc;
+    -fx-color: -fx-base;
     -fx-background: derive(-fx-base, 10%);
     -fx-focus-color: derive(-fx-base, 50%);
     -fx-background-image: url("../gfx/pattern.jpg");

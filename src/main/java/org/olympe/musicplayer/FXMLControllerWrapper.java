@@ -107,6 +107,7 @@ public class FXMLControllerWrapper {
             public void changed(ObservableValue<? extends Image> observable, Image oldValue, Image newValue) {
                 if (newValue != null) {
                     Color color = controller.getPredominantColor(newValue);
+                    color = new Color(1.0 - color.getRed(), 1.0 - color.getGreen(), 1.0 - color.getBlue(), 1.0 - color.getOpacity());
                     String colorStr = toHexString(color);
                     try {
                         File tmpStyleSheet = File.createTempFile("musicplayer-", "-style.css");
