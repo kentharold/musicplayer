@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.effect.*?>
 <?import javafx.scene.text.*?>
 <?import de.jensd.fx.glyphs.materialdesignicons.*?>
 <?import de.jensd.fx.glyphs.fontawesome.*?>
@@ -21,6 +22,9 @@
                <center>
                   <ImageView fx:id="coverView" pickOnBounds="true" />
                </center>
+               <effect>
+                  <GaussianBlur />
+               </effect>
             </BorderPane>
             <VBox onDragDetected="#onDragDetected" onDragDone="#onDragDone" onDragDropped="#onDragDropped" onDragEntered="#onDragEntered" onDragExited="#onDragExited" onDragOver="#onDragOver">
                <children>
