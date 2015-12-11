@@ -77,18 +77,15 @@
     -fx-background-radius: 10;
 }
 
-.label, .label .glyph-icon {
+.label, .label .glyph-icon, .list-cell {
+    -fx-background-color: none;
+    -fx-blend-mode: hard-light;
     -fx-text-fill: derive(-fx-base, -50%);
     -fx-fill: derive(-fx-base, -50%);
 }
 
 .list-view {
     -fx-background-color: none;
-}
-
-.list-cell {
-    -fx-background-color: none;
-    -fx-text-fill: derive(-fx-base, -50%);
 }
 
 .scroll-bar {
