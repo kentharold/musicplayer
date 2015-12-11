@@ -43,6 +43,7 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
     private IntegerProperty currentIndex = new SimpleIntegerProperty(-1);
     private LongProperty totalTime = new SimpleLongProperty();
     private BooleanProperty currentDurationChangingInternally = new SimpleBooleanProperty(false);
+    private BooleanProperty isPlaying = new SimpleBooleanProperty(false);
     private ChangeListener<Duration> currentTimeChangeListener = new ChangeListener<Duration>() {
         @Override
         public void changed(ObservableValue<? extends Duration> observable, Duration oldValue, Duration newValue) {
@@ -68,6 +69,7 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
         if (oldValue != null) {
             oldValue.currentTimeProperty().removeListener(currentTimeChangeListener);
             oldValue.totalDurationProperty().removeListener(totalTimeChangeListener);
+            oldValue.stop();
         }
         if (newValue != null) {
             newValue.currentTimeProperty().addListener(currentTimeChangeListener);
@@ -77,6 +79,8 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
             if (newValue.getTotalDuration() != null) {
                 totalTime.set((long) newValue.getTotalDuration().toMillis());
             }
+            if (isPlaying.get())
+                newValue.play();
         }
     };
     private ObjectProperty<MediaPlayer> currentMediaPlayer = new SimpleObjectProperty<>();
@@ -253,21 +257,15 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
     public void gotoTrack(int offset) {
         int index = currentIndex.get() + offset;
         index = index % musicFiles.getSize();
-        boolean wasPlaying = false;
-        if (currentMediaPlayer.get() != null) {
-            wasPlaying = currentMediaPlayer.get().getStatus() == MediaPlayer.Status.PLAYING;
-            currentMediaPlayer.get().stop();
-        }
         File file = musicFiles.get(index);
         MediaPlayer player = mediaPlayers.get(file);
-        player.setAutoPlay(wasPlaying);
         currentMediaPlayer.set(player);
         currentIndex.set(index);
     }
 
     @Override
     public ObservableBooleanValue canGotoPreviousTrack() {
-        return Bindings.isNotEmpty(musicFiles).and(currentIndex.isNotEqualTo(0));
+        return Bindings.isNotEmpty(musicFiles).and(currentIndex.greaterThan(-1));
     }
 
     @Override
@@ -277,13 +275,23 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
 
     @Override
     public ObservableBooleanValue canGotoNextTract() {
-        return Bindings.isNotEmpty(musicFiles).and(currentIndex.isNotEqualTo(Bindings.size(musicFiles).subtract(1)));
+        return Bindings.isNotEmpty(musicFiles).and(currentIndex.lessThan(Bindings.size(musicFiles).subtract(1)));
     }
 
     @Override
+    public ObservableBooleanValue isLoaded() {
+        return Bindings.isNotNull(currentMediaPlayer);
+    }
+
+   /* @Override
     public ObservableBooleanValue isPlaying() {
         ObjectBinding<MediaPlayer.Status> statusBinding = Bindings.select(currentMediaPlayer, "status");
         return statusBinding.isEqualTo(MediaPlayer.Status.PLAYING);
+    }*/
+
+    @Override
+    public BooleanProperty isPlayingProperty() {
+        return isPlaying;
     }
 
     @Override

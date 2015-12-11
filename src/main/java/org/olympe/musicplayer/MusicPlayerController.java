@@ -33,7 +33,7 @@ public interface MusicPlayerController {
 
     ObservableBooleanValue canGotoNextTract();
 
-    ObservableBooleanValue isPlaying();
+    // ObservableBooleanValue isPlaying();
 
     DoubleProperty currentDurationProperty();
 
@@ -50,4 +50,8 @@ public interface MusicPlayerController {
     ObservableValue<? extends Image> coverImageProperty();
 
     Color getPredominantColor(Image newValue);
+
+    ObservableBooleanValue isLoaded();
+
+    BooleanProperty isPlayingProperty();
 }

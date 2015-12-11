@@ -20,6 +20,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import jfxtras.labs.util.Util;
 import org.olympe.musicplayer.util.ColorThief;
 
 import java.awt.image.BufferedImage;
@@ -82,13 +83,14 @@ public class FXMLControllerWrapper {
         playPauseBtn.disableProperty().bind(Bindings.not(controller.canTogglePlayPause()));
         nextTractBtn.disableProperty().bind(Bindings.not(controller.canGotoNextTract()));
         // playPauseBtn.selectedProperty().bind(controller.isPlaying());
-        durationSlider.disableProperty().bind(Bindings.not(controller.isPlaying()));
+        controller.isPlayingProperty().bind(playPauseBtn.selectedProperty());
+        durationSlider.disableProperty().bind(Bindings.not(controller.isLoaded()));
         durationSlider.valueProperty().bindBidirectional(controller.currentDurationProperty());
-        currentTimeLbl.visibleProperty().bind(controller.isPlaying());
-        currentTimeLbl.managedProperty().bind(controller.isPlaying());
+        currentTimeLbl.visibleProperty().bind(controller.isLoaded());
+        currentTimeLbl.managedProperty().bind(controller.isLoaded());
         currentTimeLbl.textProperty().bind(Bindings.format("%1$tM:%1$tS", controller.currentTimeProperty()));
-        totalTimeLbl.visibleProperty().bind(controller.isPlaying());
-        totalTimeLbl.managedProperty().bind(controller.isPlaying());
+        totalTimeLbl.visibleProperty().bind(controller.isLoaded());
+        totalTimeLbl.managedProperty().bind(controller.isLoaded());
         totalTimeLbl.textProperty().bind(Bindings.format("%1$tM:%1$tS", controller.totalTimeProperty()));
         muteToggleBtn.selectedProperty().bindBidirectional(controller.muteProperty());
         volumeSlider.valueProperty().bindBidirectional(controller.volumeProperty());
@@ -107,8 +109,8 @@ public class FXMLControllerWrapper {
             public void changed(ObservableValue<? extends Image> observable, Image oldValue, Image newValue) {
                 if (newValue != null) {
                     Color color = controller.getPredominantColor(newValue);
-                    color = new Color(1.0 - color.getRed(), 1.0 - color.getGreen(), 1.0 - color.getBlue(), 1.0 - color.getOpacity());
-                    String colorStr = toHexString(color);
+                    // color = new Color(1.0 - color.getRed(), 1.0 - color.getGreen(), 1.0 - color.getBlue(), 1.0 - color.getOpacity());
+                    String colorStr = Util.colorToCssColor(color);
                     try {
                         File tmpStyleSheet = File.createTempFile("musicplayer-", "-style.css");
                         tmpStyleSheet.deleteOnExit();
@@ -118,7 +120,7 @@ public class FXMLControllerWrapper {
                         reader.lines().forEach(line -> {
                             try {
                                 String pattern = "(\\s*)(-fx-base\\s*:\\s*)(#\\w+);";
-                                if (line.matches(pattern))
+                                 if (line.matches(pattern))
                                     line = line.replaceAll(pattern, "$1$2" + colorStr + ";");
                                 writer.append(line);
                             } catch (IOException e) {
@@ -135,6 +137,7 @@ public class FXMLControllerWrapper {
                 }
             }
         });
+        // or try to set the cover image as root background image.
     }
 
     private String toHexString(Color color) {
