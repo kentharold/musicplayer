@@ -98,6 +98,8 @@
 .scroll-bar .decrement-button,
 .scroll-bar .decrement-button .decrement-arrow,
 .scroll-bar .increment-button,
-.scroll-bar .increment-button .increment-arrow{
+.scroll-bar .increment-button .increment-arrow
+.scroll-bar .track
+.scroll-bar .corner {
     visibility: hidden;
 }
