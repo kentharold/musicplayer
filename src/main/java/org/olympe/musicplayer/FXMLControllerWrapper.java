@@ -16,6 +16,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import jfxtras.labs.util.Util;
 import org.olympe.musicplayer.util.FileNameStringConverter;
@@ -66,6 +67,8 @@ public class FXMLControllerWrapper {
     private StackPane backgroundPane;
     @FXML
     private ImageView coverView;
+
+    private FileChooser fileChooser;
 
     private Preferences appPreferences;
     private Preferences viewPreferences;
@@ -251,6 +254,25 @@ public class FXMLControllerWrapper {
         controller.toggleRepeat();
     }
 
+    @FXML
+    void addMusicFiles() {
+        if (fileChooser == null) {
+            fileChooser = new FileChooser();
+            String pathName = viewPreferences.get("lastInitialDirectory", System.getProperty("user.home"));
+            fileChooser.setInitialDirectory(new File(pathName));
+            fileChooser.setTitle("Choose audio files to play...");
+
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Audio Files", "*.mp3", "*.wav", "*.aac"));
+        }
+        List<File> files = fileChooser.showOpenMultipleDialog(stage);
+        if (files != null && !files.isEmpty())
+        {
+            File dir = files.get(0).getParentFile();
+            fileChooser.setInitialDirectory(dir);
+            controller.addFiles(files);
+        }
+    }
+
     private void initPreferences() {
         if (appPreferences == null) {
             Preferences prefs = Preferences.userRoot();
@@ -273,6 +295,11 @@ public class FXMLControllerWrapper {
         viewPreferences.putDouble("yPosition", stage.getY());
         viewPreferences.putDouble("width", stage.getWidth());
         viewPreferences.putDouble("height", stage.getHeight());
+        if (fileChooser != null) {
+            File dir = fileChooser.getInitialDirectory();
+            if (dir != null)
+                viewPreferences.put("lastInitialDirectory", dir.getAbsolutePath());
+        }
 
         playerPreferences.putBoolean("isMuteSelected", muteToggleBtn.isSelected());
         playerPreferences.putBoolean("isRepeatSelected", repeatToggleBtn.isSelected());
@@ -297,8 +324,7 @@ public class FXMLControllerWrapper {
         repeatToggleBtn.setIndeterminate(playerPreferences.getBoolean("isRepeatIndeterminate", false));
         volumeSlider.setValue(playerPreferences.getDouble("volume", 0.5));
         byte[] bytes = playerPreferences.getByteArray("last-opened", null);
-        if (bytes != null)
-        {
+        if (bytes != null) {
             String data = new String(bytes, Charset.defaultCharset());
             String[] filePathnames = data.split(File.pathSeparator);
             Stream<File> files = Stream.of(filePathnames).map(File::new);
