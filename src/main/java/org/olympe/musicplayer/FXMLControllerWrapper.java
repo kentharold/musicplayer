@@ -308,6 +308,7 @@ public class FXMLControllerWrapper {
         Stream<File> files = musicFilesView.getItems().stream();
         String data = String.join(File.pathSeparator, files.map(File::getAbsolutePath).collect(Collectors.toList()));
         playerPreferences.putByteArray("last-opened", data.getBytes(Charset.defaultCharset()));
+        playerPreferences.putInt("last-played", controller.currentIndexProperty().get());
     }
 
     private void restoreState() {
@@ -328,7 +329,10 @@ public class FXMLControllerWrapper {
             String data = new String(bytes, Charset.defaultCharset());
             String[] filePathnames = data.split(File.pathSeparator);
             Stream<File> files = Stream.of(filePathnames).map(File::new);
-            Platform.runLater(() -> musicFilesView.getItems().addAll(files.collect(Collectors.toList())));
+            Platform.runLater(() -> {
+                musicFilesView.getItems().addAll(files.collect(Collectors.toList()));
+                controller.gotoTrack(playerPreferences.getInt("last-played", 0));
+            });
         }
     }
 }

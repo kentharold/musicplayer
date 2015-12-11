@@ -1,9 +1,6 @@
 package org.olympe.musicplayer;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.Property;
+import javafx.beans.property.*;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -54,4 +51,6 @@ public interface MusicPlayerController {
     ObservableBooleanValue isLoaded();
 
     BooleanProperty isPlayingProperty();
+
+    ReadOnlyIntegerProperty currentIndexProperty();
 }

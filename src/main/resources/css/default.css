@@ -97,6 +97,6 @@
 .scroll-bar .increment-button,
 .scroll-bar .increment-button .increment-arrow
 .scroll-bar .track
-.scroll-bar .corner {
+.list-view .virtual-flow .corner {
     visibility: hidden;
 }

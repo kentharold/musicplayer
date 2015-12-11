@@ -200,6 +200,11 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
     }
 
     @Override
+    public ReadOnlyIntegerProperty currentIndexProperty() {
+        return currentIndex;
+    }
+
+    @Override
     public Color getPredominantColor(Image newValue) {
         return predominantColorsCache.get(newValue);
     }
