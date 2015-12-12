@@ -79,10 +79,6 @@ public class FXMLControllerWrapper {
         initPreferences();
     }
 
-    public MusicPlayerController getController() {
-        return controller;
-    }
-
     @FXML
     void initialize() {
         musicFilesView.setItems(controller.getMusicFiles());
@@ -153,14 +149,13 @@ public class FXMLControllerWrapper {
         });
     }
 
-    private String toHexString(Color color) {
+    /*private String toHexString(Color color) {
         int colorValue = ((Double.valueOf(color.getOpacity() * 255.0).intValue() & 0xFF) << 24) |
                 ((Double.valueOf(color.getRed() * 255.0).intValue() & 0xFF) << 16) |
                 ((Double.valueOf(color.getGreen() * 255.0).intValue() & 0xFF) << 8) |
-                ((Double.valueOf(color.getBlue() * 255.0).intValue() & 0xFF) << 0);
-        String colorStr = "#" + Integer.toHexString(colorValue);
-        return colorStr;
-    }
+                ((Double.valueOf(color.getBlue() * 255.0).intValue() & 0xFF));
+        return "#" + Integer.toHexString(colorValue);
+    }*/
 
     @FXML
     void toggleFullScreen() {

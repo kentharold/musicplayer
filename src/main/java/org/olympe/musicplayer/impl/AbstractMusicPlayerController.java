@@ -5,7 +5,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -39,25 +38,14 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractMusicPlayerController implements MusicPlayerController {
 
+    private static final String EMPTY_COVER_IMAGE_URL = "https://image.freepik.com/free-icon/music-cd_318-48567.png";
+    private final Image emptyCoverImage = new Image(EMPTY_COVER_IMAGE_URL);
     private ListProperty<File> musicFiles = new SimpleListProperty<>();
     private MapProperty<File, MediaPlayer> mediaPlayers = new SimpleMapProperty<>();
     private IntegerProperty currentIndex = new SimpleIntegerProperty(-1);
     private LongProperty totalTime = new SimpleLongProperty();
     private BooleanProperty currentDurationChangingInternally = new SimpleBooleanProperty(false);
     private BooleanProperty isPlaying = new SimpleBooleanProperty(false);
-    private ChangeListener<Duration> currentTimeChangeListener = new ChangeListener<Duration>() {
-        @Override
-        public void changed(ObservableValue<? extends Duration> observable, Duration oldValue, Duration newValue) {
-            if (newValue != null) {
-                long currentMillis = (long) newValue.toMillis();
-                currentTime.set(currentMillis);
-                currentDurationChangingInternally.set(true);
-                double duration = (newValue.toMillis() / totalTime.get()) * 100;
-                currentDuration.set(duration);
-                currentDurationChangingInternally.set(false);
-            }
-        }
-    };
     private ChangeListener<Duration> totalTimeChangeListener = (observable, oldValue, newValue) -> {
         if (newValue != null) {
             totalTime.set((long) newValue.toMillis());
@@ -66,9 +54,9 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
     private ObjectProperty<Image> coverImage = new SimpleObjectProperty<>();
     private Map<Object, Image> coversCache = new HashMap<>();
     private Map<MediaPlayer, Image> coversMap = new HashMap<>();
-
     private ObjectProperty<MediaPlayer> currentMediaPlayer = new SimpleObjectProperty<>();
     private IntegerProperty repeat = new SimpleIntegerProperty(0);
+    private LongProperty currentTime = new SimpleLongProperty();
     private DoubleProperty currentDuration = new SimpleDoubleProperty(0.0) {
         @Override
         protected void invalidated() {
@@ -77,7 +65,16 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
             }
         }
     };
-    private LongProperty currentTime = new SimpleLongProperty();
+    private ChangeListener<Duration> currentTimeChangeListener = (observable, oldValue, newValue) -> {
+        if (newValue != null) {
+            long currentMillis = (long) newValue.toMillis();
+            currentTime.set(currentMillis);
+            currentDurationChangingInternally.set(true);
+            double duration = (newValue.toMillis() / totalTime.get()) * 100;
+            currentDuration.set(duration);
+            currentDurationChangingInternally.set(false);
+        }
+    };
     private DoubleProperty volume = new SimpleDoubleProperty(1.0) {
         @Override
         protected void invalidated() {
@@ -93,28 +90,6 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
             Platform.runLater(() -> mediaPlayers.values().parallelStream().forEach(mediaPlayer -> mediaPlayer.setMute(get())));
         }
     };
-    private ChangeListener<MediaPlayer> mediaPlayerChangeListener = (observable, oldValue, newValue) -> {
-        if (oldValue != null) {
-            oldValue.currentTimeProperty().removeListener(currentTimeChangeListener);
-            oldValue.totalDurationProperty().removeListener(totalTimeChangeListener);
-            oldValue.stop();
-        }
-        currentDuration.set(0.0);
-        currentTime.set(0);
-        if (newValue != null) {
-            newValue.currentTimeProperty().addListener(currentTimeChangeListener);
-            newValue.totalDurationProperty().addListener(totalTimeChangeListener);
-
-            coverImage.set(coversMap.get(newValue));
-            if (newValue.getTotalDuration() != null) {
-                totalTime.set((long) newValue.getTotalDuration().toMillis());
-            }
-            if (isPlaying.get())
-                newValue.play();
-        }
-    };
-    private static final String EMPTY_COVER_IMAGE_URL = "https://image.freepik.com/free-icon/music-cd_318-48567.png";
-    private final Image emptyCoverImage = new Image(EMPTY_COVER_IMAGE_URL);
     private Map<Image, Color> predominantColorsCache = new HashMap<>();
 
     public AbstractMusicPlayerController() {
@@ -174,7 +149,7 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
                                 Color color = predominantColorsCache.get(img);
                                 if (color == null) {
                                     BufferedImage bImg = ImageIO.read(new URL(EMPTY_COVER_IMAGE_URL));
-                                    int[] rgb = ColorThief.getColor(bImg, 1, false);
+                                    int[] rgb = ColorThief.getColor(bImg);
                                     if (rgb != null)
                                         color = new Color(rgb[0] / 255.0, rgb[1] / 255.0, rgb[2] / 255.0, 0.0);
                                     predominantColorsCache.put(img, color);
@@ -200,6 +175,26 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
             if (currentMediaPlayer.get() == null)
                 gotoTrack(+1);
         });
+        ChangeListener<MediaPlayer> mediaPlayerChangeListener = (observable, oldValue, newValue) -> {
+            if (oldValue != null) {
+                oldValue.currentTimeProperty().removeListener(currentTimeChangeListener);
+                oldValue.totalDurationProperty().removeListener(totalTimeChangeListener);
+                oldValue.stop();
+            }
+            currentDuration.set(0.0);
+            currentTime.set(0);
+            if (newValue != null) {
+                newValue.currentTimeProperty().addListener(currentTimeChangeListener);
+                newValue.totalDurationProperty().addListener(totalTimeChangeListener);
+
+                coverImage.set(coversMap.get(newValue));
+                if (newValue.getTotalDuration() != null) {
+                    totalTime.set((long) newValue.getTotalDuration().toMillis());
+                }
+                if (isPlaying.get())
+                    newValue.play();
+            }
+        };
         currentMediaPlayer.addListener(mediaPlayerChangeListener);
     }
 
@@ -300,12 +295,6 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
     public ObservableBooleanValue isLoaded() {
         return Bindings.isNotNull(currentMediaPlayer);
     }
-
-   /* @Override
-    public ObservableBooleanValue isPlaying() {
-        ObjectBinding<MediaPlayer.Status> statusBinding = Bindings.select(currentMediaPlayer, "status");
-        return statusBinding.isEqualTo(MediaPlayer.Status.PLAYING);
-    }*/
 
     @Override
     public BooleanProperty isPlayingProperty() {

@@ -1,6 +1,9 @@
 package org.olympe.musicplayer;
 
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.LongProperty;
+import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -11,6 +14,8 @@ import java.io.File;
 import java.util.List;
 
 public interface MusicPlayerController {
+
+    // Methods
 
     void addFiles(List<File> files);
 
@@ -24,33 +29,33 @@ public interface MusicPlayerController {
 
     void gotoTrack(int i);
 
+    Color getPredominantColor(Image newValue);
+
+    void seek(double value);
+
+    // Properties & Bindings
+
     ObservableBooleanValue canGotoPreviousTrack();
 
     ObservableBooleanValue canTogglePlayPause();
 
     ObservableBooleanValue canGotoNextTract();
 
-    // ObservableBooleanValue isPlaying();
+    ObservableBooleanValue isLoaded();
 
-    DoubleProperty currentDurationProperty();
+    BooleanProperty muteProperty();
+
+    BooleanProperty isPlayingProperty();
 
     LongProperty totalTimeProperty();
 
     LongProperty currentTimeProperty();
 
-    BooleanProperty muteProperty();
+    DoubleProperty currentDurationProperty();
 
     DoubleProperty volumeProperty();
 
-    void seek(double value);
-
     ObservableValue<? extends Image> coverImageProperty();
-
-    Color getPredominantColor(Image newValue);
-
-    ObservableBooleanValue isLoaded();
-
-    BooleanProperty isPlayingProperty();
 
     ReadOnlyIntegerProperty currentIndexProperty();
 
