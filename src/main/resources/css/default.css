@@ -106,5 +106,5 @@
 }
 
 .audio-list-cell:loaded {
-    -fx-background-color: antiquewhite;
+    -fx-background-color: -fx-base;
 }

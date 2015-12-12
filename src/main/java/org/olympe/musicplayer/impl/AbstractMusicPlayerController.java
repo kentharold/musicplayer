@@ -87,7 +87,10 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
     private BooleanProperty mute = new SimpleBooleanProperty() {
         @Override
         protected void invalidated() {
-            mediaPlayers.values().forEach(mediaPlayer -> mediaPlayer.setMute(get()));
+            MediaPlayer player = currentMediaPlayer.get();
+            if (player != null)
+                player.setMute(get());
+            Platform.runLater(() -> mediaPlayers.values().parallelStream().forEach(mediaPlayer -> mediaPlayer.setMute(get())));
         }
     };
     private ChangeListener<MediaPlayer> mediaPlayerChangeListener = (observable, oldValue, newValue) -> {
