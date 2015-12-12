@@ -1,7 +1,7 @@
 package org.olympe.musicplayer.impl;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
@@ -223,11 +223,13 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
     @Override
     public void seek(double value) {
         MediaPlayer player = currentMediaPlayer.get();
-        if (player != null)
-        {
-            player.seek(Duration.millis((value / 100) * totalTime.get()));
-            if (player.getStatus() != MediaPlayer.Status.PLAYING)
-                currentTime.set((long) ((value / 100) * totalTime.get()));
+        if (player != null) {
+            Platform.runLater(() -> {
+                // can only seek when the player is ready.
+                player.seek(Duration.millis((value / 100) * totalTime.get()));
+                if (player.getStatus() != MediaPlayer.Status.PLAYING)
+                    currentTime.set((long) ((value / 100) * totalTime.get()));
+            });
         }
     }
 

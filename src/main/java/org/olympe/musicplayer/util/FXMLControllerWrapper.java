@@ -5,7 +5,6 @@ import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -21,14 +20,12 @@ import javafx.stage.Stage;
 import jfxtras.labs.util.Util;
 import org.olympe.musicplayer.MusicPlayerController;
 import org.olympe.musicplayer.impl.control.AudioListCell;
-import org.olympe.musicplayer.util.FileNameStringConverter;
 
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -267,8 +264,7 @@ public class FXMLControllerWrapper {
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Audio Files", "*.mp3", "*.wav", "*.aac"));
         }
         List<File> files = fileChooser.showOpenMultipleDialog(stage);
-        if (files != null && !files.isEmpty())
-        {
+        if (files != null && !files.isEmpty()) {
             File dir = files.get(0).getParentFile();
             fileChooser.setInitialDirectory(dir);
             controller.addFiles(files);
@@ -311,6 +307,7 @@ public class FXMLControllerWrapper {
         String data = String.join(File.pathSeparator, files.map(File::getAbsolutePath).collect(Collectors.toList()));
         playerPreferences.putByteArray("last-opened", data.getBytes(Charset.defaultCharset()));
         playerPreferences.putInt("last-played", controller.currentIndexProperty().get());
+        playerPreferences.putDouble("last-time", controller.currentDurationProperty().get());
     }
 
     private void restoreState() {
@@ -334,6 +331,7 @@ public class FXMLControllerWrapper {
             Platform.runLater(() -> {
                 musicFilesView.getItems().addAll(files.collect(Collectors.toList()));
                 controller.gotoTrack(playerPreferences.getInt("last-played", 0));
+                Platform.runLater(() -> durationSlider.setValue(playerPreferences.getDouble("last-time", 0)));
             });
         }
     }
