@@ -53,4 +53,6 @@ public interface MusicPlayerController {
     BooleanProperty isPlayingProperty();
 
     ReadOnlyIntegerProperty currentIndexProperty();
+
+    ObservableBooleanValue createIsLoadedBindingFor(File item);
 }

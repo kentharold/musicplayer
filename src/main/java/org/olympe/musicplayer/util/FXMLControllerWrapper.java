@@ -86,7 +86,7 @@ public class FXMLControllerWrapper {
     @FXML
     void initialize() {
         musicFilesView.setItems(controller.getMusicFiles());
-        musicFilesView.setCellFactory(AudioListCell.forListView(new FileNameStringConverter()));
+        musicFilesView.setCellFactory(AudioListCell.forListView(controller, new FileNameStringConverter()));
         musicFilesView.setPlaceholder(new Region());
         prevTrackBtn.disableProperty().bind(Bindings.not(controller.canGotoPreviousTrack()));
         playPauseBtn.disableProperty().bind(Bindings.not(controller.canTogglePlayPause()));

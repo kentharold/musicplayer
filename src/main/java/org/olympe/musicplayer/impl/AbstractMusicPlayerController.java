@@ -333,4 +333,9 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
     public DoubleProperty volumeProperty() {
         return volume;
     }
+
+    @Override
+    public ObservableBooleanValue createIsLoadedBindingFor(File item) {
+        return musicFiles.valueAt(currentIndex).isEqualTo(item);
+    }
 }

@@ -104,3 +104,7 @@
 .list-view .virtual-flow .corner {
     visibility: hidden;
 }
+
+.audio-list-cell:loaded {
+    -fx-background-color: antiquewhite;
+}

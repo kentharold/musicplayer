@@ -8,13 +8,29 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
+import org.olympe.musicplayer.MusicPlayerController;
 
-public class AudioListCell<T> extends TextFieldListCell<T> {
+import java.io.File;
+
+public class AudioListCell extends TextFieldListCell<File> {
 
     private static final PseudoClass PSEUDO_CLASS_LOADED = PseudoClass.getPseudoClass("loaded");
 
-    public AudioListCell(StringConverter<T> converter) {
+    private final MusicPlayerController controller;
+
+    public AudioListCell(MusicPlayerController controller, StringConverter<File> converter) {
         super(converter);
+        getStyleClass().add("audio-list-cell");
+        this.controller = controller;
+    }
+
+    @Override
+    public void updateItem(File item, boolean empty) {
+        if (loaded.isBound())
+            loaded.unbind();
+        super.updateItem(item, empty);
+        if (!empty && item != null)
+            loaded.bind(controller.createIsLoadedBindingFor(item));
     }
 
     // loaded
@@ -33,7 +49,8 @@ public class AudioListCell<T> extends TextFieldListCell<T> {
         return loaded.get();
     }
 
-    public static <T> Callback<ListView<T>, ListCell<T>> forListView(StringConverter<T> converter) {
-        return list -> new AudioListCell(converter);
+    public static Callback<ListView<File>, ListCell<File>> forListView(MusicPlayerController controller, StringConverter<File> converter) {
+        return list -> new AudioListCell(controller, converter);
     }
+
 }
