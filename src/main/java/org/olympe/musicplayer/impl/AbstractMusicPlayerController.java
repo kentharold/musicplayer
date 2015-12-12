@@ -39,7 +39,9 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractMusicPlayerController implements MusicPlayerController {
 
-    private static final String EMPTY_COVER_IMAGE_URL = "https://image.freepik.com/free-icon/music-cd_318-48567.png";
+    // private static final String EMPTY_COVER_IMAGE_URL = "http://www.download-hd-wallpapers.com/wp-content/uploads/2014/08/free-background-music-for-videos.jpg";
+    // private static final String EMPTY_COVER_IMAGE_URL = "https://image.freepik.com/free-icon/music-cd_318-48567.png";
+    private static final String EMPTY_COVER_IMAGE_URL = ClassLoader.getSystemResource("gfx/pattern.jpg").toExternalForm();
     private final Image emptyCoverImage = new Image(EMPTY_COVER_IMAGE_URL);
     private ListProperty<File> musicFiles = new SimpleListProperty<>();
     private MapProperty<File, MediaPlayer> mediaPlayers = new SimpleMapProperty<>();
@@ -140,7 +142,7 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
                                             BufferedImage bImg = ImageIO.read(new URL(url));
                                             int[] rgb = ColorThief.getColor(bImg, 1, false);
                                             if (rgb != null)
-                                                color = new Color(rgb[0] / 255.0, rgb[1] / 255.0, rgb[2] / 255.0, 0.0);
+                                                color = new Color(rgb[0] / 255.0, rgb[1] / 255.0, rgb[2] / 255.0, 1.0);
                                             predominantColorsCache.put(img, color);
                                         }
                                     }
@@ -150,9 +152,9 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
                                 Color color = predominantColorsCache.get(img);
                                 if (color == null) {
                                     BufferedImage bImg = ImageIO.read(new URL(EMPTY_COVER_IMAGE_URL));
-                                    int[] rgb = ColorThief.getColor(bImg);
+                                    int[] rgb = ColorThief.getColor(bImg, 1, false);
                                     if (rgb != null)
-                                        color = new Color(rgb[0] / 255.0, rgb[1] / 255.0, rgb[2] / 255.0, 0.0);
+                                        color = new Color(rgb[0] / 255.0, rgb[1] / 255.0, rgb[2] / 255.0, 1.0);
                                     predominantColorsCache.put(img, color);
                                 }
                             }

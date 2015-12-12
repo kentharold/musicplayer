@@ -78,7 +78,7 @@
                                     <StackPane styleClass="container" HBox.hgrow="ALWAYS">
                                        <children>
                                           <Region styleClass="container-bg" />
-                                          <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" />
+                                          <VBox alignment="CENTER" />
                                        </children>
                                     </StackPane>
                                     <StackPane styleClass="container" HBox.hgrow="ALWAYS">
