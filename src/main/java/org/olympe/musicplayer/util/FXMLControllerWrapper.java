@@ -150,17 +150,20 @@ public class FXMLControllerWrapper {
                 saveState();
             }
         });
-        Platform.runLater(() -> initializeAccelerators());
+        Platform.runLater(this::initializeAccelerators);
     }
 
     private void initializeAccelerators() {
         Scene scene = stage.getScene();
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.DELETE), fire(removeMusicFilesBtn));
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.PLAY), fire(playPauseBtn));
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.PAUSE), fire(playPauseBtn));
     }
 
-    private Runnable fire(Button btn) {
-        return () -> Platform.runLater(() -> btn.fire());
+    private Runnable fire(ButtonBase btn) {
+        return () -> Platform.runLater(btn::fire);
     }
+
     /*private String toHexString(Color color) {
         int colorValue = ((Double.valueOf(color.getOpacity() * 255.0).intValue() & 0xFF) << 24) |
                 ((Double.valueOf(color.getRed() * 255.0).intValue() & 0xFF) << 16) |
