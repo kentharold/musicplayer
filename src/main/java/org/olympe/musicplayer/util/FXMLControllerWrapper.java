@@ -1,4 +1,4 @@
-package org.olympe.musicplayer;
+package org.olympe.musicplayer.util;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -19,6 +19,7 @@ import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import jfxtras.labs.util.Util;
+import org.olympe.musicplayer.MusicPlayerController;
 import org.olympe.musicplayer.impl.control.AudioListCell;
 import org.olympe.musicplayer.util.FileNameStringConverter;
 

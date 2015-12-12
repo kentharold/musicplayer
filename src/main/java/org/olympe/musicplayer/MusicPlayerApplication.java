@@ -7,6 +7,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.olympe.musicplayer.impl.DefaultMusicPlayerController;
+import org.olympe.musicplayer.util.FXMLControllerWrapper;
 
 import java.io.IOException;
 import java.net.URL;
