@@ -1,4 +1,4 @@
-package org.olympe.musicplayer;
+package org.olympe.musicplayer.impl;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
@@ -22,6 +22,7 @@ import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.datatype.Artwork;
+import org.olympe.musicplayer.MusicPlayerController;
 import org.olympe.musicplayer.util.ColorThief;
 
 import javax.imageio.ImageIO;
@@ -277,7 +278,7 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
 
     @Override
     public ObservableBooleanValue canGotoPreviousTrack() {
-        return Bindings.isNotEmpty(musicFiles).and(currentIndex.greaterThan(-1));
+        return Bindings.isNotEmpty(musicFiles).and(currentIndex.greaterThan(0));
     }
 
     @Override

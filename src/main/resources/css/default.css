@@ -84,6 +84,10 @@
     -fx-fill: derive(-fx-base, -50%);
 }
 
+.list-cell {
+    -fx-max-width: 100;
+}
+
 .list-view {
     -fx-background-color: none;
 }

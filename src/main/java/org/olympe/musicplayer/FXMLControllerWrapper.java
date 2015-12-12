@@ -19,6 +19,7 @@ import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import jfxtras.labs.util.Util;
+import org.olympe.musicplayer.impl.control.AudioListCell;
 import org.olympe.musicplayer.util.FileNameStringConverter;
 
 import java.io.*;
@@ -87,7 +88,7 @@ public class FXMLControllerWrapper {
     @FXML
     void initialize() {
         musicFilesView.setItems(controller.getMusicFiles());
-        musicFilesView.setCellFactory(TextFieldListCell.forListView(new FileNameStringConverter()));
+        musicFilesView.setCellFactory(AudioListCell.forListView(new FileNameStringConverter()));
         musicFilesView.setPlaceholder(new Region());
         prevTrackBtn.disableProperty().bind(Bindings.not(controller.canGotoPreviousTrack()));
         playPauseBtn.disableProperty().bind(Bindings.not(controller.canTogglePlayPause()));
