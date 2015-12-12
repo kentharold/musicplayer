@@ -108,6 +108,7 @@
 .audio-list-cell:loaded {
     -fx-background-color: -fx-base;
     -fx-font-weight: bold;
+    -fx-blend-mode: multiply;
 }
 
 .audio-list-cell:selected {
