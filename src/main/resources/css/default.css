@@ -99,12 +99,17 @@
 .scroll-bar .decrement-button,
 .scroll-bar .decrement-button .decrement-arrow,
 .scroll-bar .increment-button,
-.scroll-bar .increment-button .increment-arrow
-.scroll-bar .track
+.scroll-bar .increment-button .increment-arrow,
+.scroll-bar .track,
 .list-view .virtual-flow .corner {
     visibility: hidden;
 }
 
 .audio-list-cell:loaded {
     -fx-background-color: -fx-base;
+    -fx-font-weight: bold;
+}
+
+.audio-list-cell:selected {
+    -fx-background-color: -fx-focus-color;
 }

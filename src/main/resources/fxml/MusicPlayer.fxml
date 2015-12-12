@@ -90,11 +90,20 @@
                                                    <children>
                                                       <Label contentDisplay="RIGHT" text="Play Queue">
                                                          <graphic>
-                                                            <Button mnemonicParsing="false" onAction="#addMusicFiles" styleClass="control-button" text="Add">
-                                                               <graphic>
-                                                                  <FontAwesomeIconView glyphName="PLUS_SQUARE" />
-                                                               </graphic>
-                                                            </Button>
+                                                            <HBox alignment="CENTER_LEFT">
+                                                               <children>
+                                                                  <Button mnemonicParsing="false" onAction="#addMusicFiles" styleClass="control-button" text="Add">
+                                                                     <graphic>
+                                                                        <FontAwesomeIconView glyphName="PLUS_SQUARE" />
+                                                                     </graphic>
+                                                                  </Button>
+                                                                  <Button fx:id="removeMusicFilesBtn" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#removeMusicFiles" styleClass="control-button" text="Remove">
+                                                                     <graphic>
+                                                                        <FontAwesomeIconView glyphName="MINUS_SQUARE" />
+                                                                     </graphic>
+                                                                  </Button>
+                                                               </children>
+                                                            </HBox>
                                                          </graphic>
                                                       </Label>
                                                    </children>

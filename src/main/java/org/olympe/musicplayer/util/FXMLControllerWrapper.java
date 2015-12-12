@@ -4,12 +4,10 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TransferMode;
+import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -66,6 +64,8 @@ public class FXMLControllerWrapper {
     private StackPane backgroundPane;
     @FXML
     private ImageView coverView;
+    @FXML
+    private Button removeMusicFilesBtn;
 
     private FileChooser fileChooser;
 
@@ -82,8 +82,11 @@ public class FXMLControllerWrapper {
     @FXML
     void initialize() {
         musicFilesView.setItems(controller.getMusicFiles());
+        musicFilesView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         musicFilesView.setCellFactory(AudioListCell.forListView(controller, new FileNameStringConverter()));
         musicFilesView.setPlaceholder(new Region());
+        removeMusicFilesBtn.visibleProperty().bind(Bindings.isNotEmpty(musicFilesView.getSelectionModel().getSelectedItems()));
+        removeMusicFilesBtn.managedProperty().bind(Bindings.isNotEmpty(musicFilesView.getSelectionModel().getSelectedItems()));
         prevTrackBtn.disableProperty().bind(Bindings.not(controller.canGotoPreviousTrack()));
         playPauseBtn.disableProperty().bind(Bindings.not(controller.canTogglePlayPause()));
         nextTractBtn.disableProperty().bind(Bindings.not(controller.canGotoNextTract()));
@@ -147,8 +150,17 @@ public class FXMLControllerWrapper {
                 saveState();
             }
         });
+        Platform.runLater(() -> initializeAccelerators());
     }
 
+    private void initializeAccelerators() {
+        Scene scene = stage.getScene();
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.DELETE), fire(removeMusicFilesBtn));
+    }
+
+    private Runnable fire(Button btn) {
+        return () -> Platform.runLater(() -> btn.fire());
+    }
     /*private String toHexString(Color color) {
         int colorValue = ((Double.valueOf(color.getOpacity() * 255.0).intValue() & 0xFF) << 24) |
                 ((Double.valueOf(color.getRed() * 255.0).intValue() & 0xFF) << 16) |
@@ -263,6 +275,18 @@ public class FXMLControllerWrapper {
             File dir = files.get(0).getParentFile();
             fileChooser.setInitialDirectory(dir);
             controller.addFiles(files);
+        }
+    }
+
+    @FXML
+    void removeMusicFiles(ActionEvent event) {
+        if (event != null && event.getSource() == removeMusicFilesBtn) {
+            List<File> selecteds = musicFilesView.getSelectionModel().getSelectedItems();
+            if (selecteds != null && !selecteds.isEmpty()) {
+                musicFilesView.getItems().removeAll(selecteds);
+                musicFilesView.getSelectionModel().clearSelection();
+            }
+            event.consume();
         }
     }
 

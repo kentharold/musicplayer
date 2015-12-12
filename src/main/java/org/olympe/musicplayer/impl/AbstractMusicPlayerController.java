@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -171,9 +172,27 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
                     }
                 }
             }
-
-            if (currentMediaPlayer.get() == null)
+            // update the index property;
+            MediaPlayer mediaPlayer = currentMediaPlayer.get();
+            if (mediaPlayer == null) {
                 gotoTrack(+1);
+            } else {
+                int index = -1;
+                File musicFile = null;
+                List<File> files = new ArrayList<>(mediaPlayers.keySet());
+                for (File file : files) {
+                    if (mediaPlayer.equals(mediaPlayers.get(file))) {
+                        musicFile = file;
+                        break;
+                    }
+                }
+                index = musicFiles.indexOf(musicFile);
+                if (index == -1) {
+                    // the current playerwas removed while loaded.
+                    Platform.runLater(() -> gotoTrack(+1));
+                }
+                currentIndex.set(index);
+            }
         });
         ChangeListener<MediaPlayer> mediaPlayerChangeListener = (observable, oldValue, newValue) -> {
             if (oldValue != null) {
@@ -328,6 +347,7 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
 
     @Override
     public ObservableBooleanValue createIsLoadedBindingFor(File item) {
-        return musicFiles.valueAt(currentIndex).isEqualTo(item);
+        // return musicFiles.valueAt(currentIndex).isEqualTo(item);
+        return mediaPlayers.valueAt(item).isEqualTo(currentMediaPlayer);
     }
 }
