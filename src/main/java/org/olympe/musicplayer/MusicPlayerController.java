@@ -1,14 +1,12 @@
 package org.olympe.musicplayer;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import org.olympe.musicplayer.impl.util.MusicFileTag;
 
 import java.io.File;
 import java.util.List;
@@ -60,4 +58,6 @@ public interface MusicPlayerController {
     ReadOnlyIntegerProperty currentIndexProperty();
 
     ObservableBooleanValue createIsLoadedBindingFor(File item);
+
+    ObjectProperty<MusicFileTag> musicFileTagProperty();
 }

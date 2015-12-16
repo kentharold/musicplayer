@@ -1,7 +1,13 @@
-package org.olympe.musicplayer.util;
+package org.olympe.musicplayer.impl;
 
+import com.github.scribejava.core.builder.ServiceBuilder;
+import com.github.scribejava.core.model.Token;
+import com.github.scribejava.core.model.Verifier;
+import com.github.scribejava.core.oauth.OAuthService;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -9,21 +15,30 @@ import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.converter.DefaultStringConverter;
 import jfxtras.labs.util.Util;
+import org.jaudiotagger.tag.TagField;
+import org.olympe.musicplayer.MusicPlayerApplication;
 import org.olympe.musicplayer.MusicPlayerController;
+import org.olympe.musicplayer.genius.Genius;
+import org.olympe.musicplayer.genius.GeniusApi;
 import org.olympe.musicplayer.impl.control.AudioListCell;
+import org.olympe.musicplayer.impl.control.TagTableCell;
+import org.olympe.musicplayer.impl.util.FileNameStringConverter;
+import org.olympe.musicplayer.impl.util.MusicFileTag;
+import org.olympe.musicplayer.impl.util.TagFileNameStringConverter;
 
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,6 +47,7 @@ public class FXMLControllerWrapper {
 
     private final MusicPlayerController controller;
     private final Stage stage;
+    private final MusicPlayerApplication musicPlayerApplication;
 
     private double mouseDragOffsetX = 0;
     private double mouseDragOffsetY = 0;
@@ -66,21 +82,43 @@ public class FXMLControllerWrapper {
     private ImageView coverView;
     @FXML
     private Button removeMusicFilesBtn;
+    @FXML
+    private TableView<TagField> tagsView;
+    @FXML
+    private ResourceBundle resources;
+    @FXML
+    private BorderPane dialogPane;
+    @FXML
+    private ButtonBar dialogButtonBar;
+    @FXML
+    private HBox dialogHeaderPane;
+    @FXML
+    private Label dialogHeaderLabel;
 
     private FileChooser fileChooser;
+    private ApplicationNotifierImpl notifier;
 
     private Preferences appPreferences;
     private Preferences viewPreferences;
     private Preferences playerPreferences;
 
-    public FXMLControllerWrapper(MusicPlayerController controller, Stage primaryStage) {
+    private Genius genius;
+
+    public FXMLControllerWrapper(MusicPlayerController controller, Stage primaryStage, MusicPlayerApplication musicPlayerApplication) {
         this.controller = controller;
         this.stage = primaryStage;
+        this.musicPlayerApplication = musicPlayerApplication;
         initPreferences();
     }
 
     @FXML
     void initialize() {
+        notifier = new ApplicationNotifierImpl();
+        notifier.overlayPane = overlayPane;
+        notifier.dialogPane = dialogPane;
+        notifier.dialogButtonBar = dialogButtonBar;
+        notifier.dialogHeaderPane = dialogHeaderPane;
+        notifier.dialogHeaderLabel = dialogHeaderLabel;
         musicFilesView.setItems(controller.getMusicFiles());
         musicFilesView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         musicFilesView.setCellFactory(AudioListCell.forListView(controller, new FileNameStringConverter()));
@@ -139,6 +177,49 @@ public class FXMLControllerWrapper {
                     stage.getScene().getStylesheets().add(tmpStyleSheet.toURI().toURL().toExternalForm());
                 } catch (IOException e) {
                     e.printStackTrace();
+                }
+            }
+        });
+        TableColumn<TagField, String> column = (TableColumn<TagField, String>) tagsView.getColumns().get(0);
+        column.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getId()));
+        column.setCellFactory(TagTableCell.forTableColumn(new TagFileNameStringConverter(resources)));
+        column = (TableColumn<TagField, String>) tagsView.getColumns().get(1);
+        column.setCellFactory(TagTableCell.forTableColumn(new DefaultStringConverter()));
+        column.setCellValueFactory(param -> {
+            TagField field = param.getValue();
+            MusicFileTag tag = controller.musicFileTagProperty().get();
+            return new ReadOnlyStringWrapper(tag.getTagValue(field));
+        });
+        controller.musicFileTagProperty().addListener((observable1, oldValue1, newValue1) -> {
+            if (newValue1 != null) {
+                tagsView.setItems(FXCollections.observableArrayList(newValue1.getTagFields()));
+                if (false && genius == null)
+                {
+                    String secretState = "secret" + new Random().nextInt(999_999);
+                    String apiKey = "Z6rpk9Dor60GpN_r-0z1jiPg2AIhpG7e7R2IM5Lv5gjA6Qj8BG44I2kulZkMfNgY";
+                    String apiSecret = "_S8D-nB84IyJ9nb7FdSvmDIBNF-YN6AO46eAQozyCb6VWEeJCKwUImfwwJgONuYzkE4LOA8dGiN3ulcransiNQ";
+                    OAuthService service = new ServiceBuilder().apiKey(apiKey)
+                            .apiSecret(apiSecret)
+                            .state(secretState)
+                            .scope("me")
+                            .provider(GeniusApi.class)
+                            .callback("http://localhost:8080/ws/oauth")
+                            .build();
+                    Token reqToken = null;
+                    String url = service.getAuthorizationUrl(reqToken);
+                    musicPlayerApplication.getHostServices().showDocument(url);
+                    String value = notifier.askString("Enter verifier: ");
+                    if (value == null)
+                        return;
+                    Verifier verifier = new Verifier(value);
+                    try
+                    {
+                        Token accessToken = service.getAccessToken(reqToken, verifier);
+                        System.out.println(accessToken);
+                        genius = new Genius();
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });

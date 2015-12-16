@@ -1,4 +1,4 @@
-package org.olympe.musicplayer.util;
+package org.olympe.musicplayer.impl.util;
 
 import org.apache.tika.Tika;
 import org.kohsuke.MetaInfServices;

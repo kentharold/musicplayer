@@ -1,4 +1,4 @@
-package org.olympe.musicplayer.util;
+package org.olympe.musicplayer.impl.util;
 
 import javafx.util.StringConverter;
 

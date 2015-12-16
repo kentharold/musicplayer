@@ -16,9 +16,9 @@
  * available at http://lokeshdhakar.com/projects/color-thief/
  */
 
-package org.olympe.musicplayer.util;
+package org.olympe.musicplayer.impl.util;
 
-import org.olympe.musicplayer.util.MMCQ.CMap;
+import org.olympe.musicplayer.impl.util.MMCQ.CMap;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;

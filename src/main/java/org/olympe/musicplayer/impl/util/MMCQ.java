@@ -16,7 +16,7 @@
  * available at http://lokeshdhakar.com/projects/color-thief/
  */
 
-package org.olympe.musicplayer.util;
+package org.olympe.musicplayer.impl.util;
 
 import java.util.*;
 

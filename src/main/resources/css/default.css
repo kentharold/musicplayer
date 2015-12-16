@@ -14,7 +14,7 @@
     -fx-background-color: none;
 }
 
-.control-button .glyph-icon {
+.glyph-icon {
     -glyph-size: 16px;
     -fx-fill: derive(-fx-base, -50%);
 }
@@ -78,7 +78,6 @@
 }
 
 .label, .label .glyph-icon, .list-cell {
-    -fx-background-color: none;
     -fx-blend-mode: hard-light;
     -fx-text-fill: derive(-fx-base, -50%);
     -fx-fill: derive(-fx-base, -50%);
@@ -88,11 +87,12 @@
     -fx-max-width: 100;
 }
 
-.list-view {
-    -fx-background-color: none;
-}
-
-.scroll-bar {
+.list-view,
+.scroll-bar,
+.label,
+.label .glyph-icon,
+.list-cell {
+    -fx-blend-mode: multiply;
     -fx-background-color: none;
 }
 
@@ -103,14 +103,102 @@
 .scroll-bar .track,
 .list-view .virtual-flow .corner {
     visibility: hidden;
+    -fx-background-color: none;
 }
 
 .audio-list-cell:loaded {
-    -fx-background-color: -fx-base;
+    -fx-background-color: derive(-fx-base, 20%);
     -fx-font-weight: bold;
     -fx-blend-mode: multiply;
 }
 
 .audio-list-cell:selected {
     -fx-background-color: -fx-focus-color;
+}
+
+.audio-list-cell:hover {
+    -fx-background-color: derive(-fx-focus-color, 70%);
+}
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: none;
+}
+
+.tab-pane .tab-header-area {
+    -fx-padding: 5px;
+}
+
+.tab {
+    -fx-background-radius: inherit;
+    -fx-padding: inherit;
+    -fx-background-color: inherit;
+    -fx-background-insets: inherit;
+}
+
+.tab .tab-label {
+    -fx-content-display: graphic-only;
+}
+
+.tab-pane .tab-label .glyph-icon {
+    -glyph-size: 24px;
+}
+
+.tab:hover .tab-label .glyph-icon {
+    -fx-stroke: -fx-focus-color;
+}
+
+.tab:selected .tab-label .glyph-icon {
+    -fx-fill: derive(-fx-base, -10%);
+}
+
+.tab:pressed .tab-label .glyph-icon {
+    -fx-fill: derive(-fx-base, 10%);
+}
+
+.table-view {
+    -fx-background-color: transparent;
+    -fx-control-inner-background: none;
+    -fx-table-cell-border-color: transparent;
+    -fx-table-header-border-color: transparent;
+}
+
+.table-row-cell, .table-row-cell:selected, .table-row-cell:filled {
+    -fx-background-color: none;
+    -fx-background-insets: none;
+    -fx-padding: 0;
+}
+
+.table-row-cell:selected .table-cell {
+    -fx-background-color: none;
+    -fx-padding: 0;
+}
+
+.table-row-cell .table-cell {
+    -fx-blend-mode: hard-light;
+    -fx-text-fill: derive(-fx-base, -50%);
+    -fx-fill: derive(-fx-base, -50%);
+    -fx-padding: 0;
+    -fx-border-width: 0;
+}
+
+.table-row-cell {
+    -fx-blend-mode: multiply;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: none;
+}
+
+.table-view .column-header, .table-view .filler {
+    visibility: hidden;
+    -fx-background-color: none;
+}
+
+.busy {
+    -fx-background-color: derive(-fx-base, -50%);
+    -fx-opacity: 60%;
+}
+
+.dialog-pane {
+    -fx-background-color: derive(-fx-base, -70%);
 }

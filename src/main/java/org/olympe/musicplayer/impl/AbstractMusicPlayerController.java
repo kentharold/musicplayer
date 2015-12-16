@@ -22,7 +22,8 @@ import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.datatype.Artwork;
 import org.olympe.musicplayer.MusicPlayerController;
-import org.olympe.musicplayer.util.ColorThief;
+import org.olympe.musicplayer.impl.util.ColorThief;
+import org.olympe.musicplayer.impl.util.MusicFileTag;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -93,7 +94,9 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
             Platform.runLater(() -> mediaPlayers.values().parallelStream().forEach(mediaPlayer -> mediaPlayer.setMute(get())));
         }
     };
+    private ObjectProperty<MusicFileTag> musicFileTag = new SimpleObjectProperty<>();
     private Map<Image, Color> predominantColorsCache = new HashMap<>();
+    private HashMap<File, MusicFileTag> tagsCache = new HashMap<>();
 
     public AbstractMusicPlayerController() {
         musicFiles.set(FXCollections.observableArrayList());
@@ -112,6 +115,7 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
                             mediaPlayers.put(file, player);
                             AudioFile audioFile = AudioFileIO.read(file);
                             Tag tag = audioFile.getTag();
+                            tagsCache.put(file, new MusicFileTag(tag));
                             Artwork artwork = tag.getFirstArtwork();
                             Image img = null;
                             if (artwork != null) {
@@ -180,14 +184,7 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
                 gotoTrack(+1);
             } else {
                 int index = -1;
-                File musicFile = null;
-                List<File> files = new ArrayList<>(mediaPlayers.keySet());
-                for (File file : files) {
-                    if (mediaPlayer.equals(mediaPlayers.get(file))) {
-                        musicFile = file;
-                        break;
-                    }
-                }
+                File musicFile = getMusicFileFor(mediaPlayer);
                 index = musicFiles.indexOf(musicFile);
                 if (index == -1) {
                     // the current playerwas removed while loaded.
@@ -212,6 +209,7 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
                 if (newValue.getTotalDuration() != null) {
                     totalTime.set((long) newValue.getTotalDuration().toMillis());
                 }
+                musicFileTag.setValue(tagsCache.get(getMusicFileFor(newValue)));
                 if (isPlaying.get())
                     newValue.play();
             }
@@ -220,9 +218,27 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
     }
 
     @Override
+    public ObjectProperty<MusicFileTag> musicFileTagProperty() {
+        return musicFileTag;
+    }
+
+    private File getMusicFileFor(MediaPlayer mediaPlayer) {
+        File musicFile = null;
+        List<File> files = new ArrayList<>(mediaPlayers.keySet());
+        for (File file : files) {
+            if (mediaPlayer.equals(mediaPlayers.get(file))) {
+                musicFile = file;
+                break;
+            }
+        }
+        return musicFile;
+    }
+
+    @Override
     public ReadOnlyIntegerProperty currentIndexProperty() {
         return currentIndex;
     }
+
 
     @Override
     public Color getPredominantColor(Image newValue) {
