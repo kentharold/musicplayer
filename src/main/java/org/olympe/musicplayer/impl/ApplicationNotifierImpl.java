@@ -98,4 +98,18 @@ public class ApplicationNotifierImpl implements ApplicationNotifier {
             return null;
         return textField.getText();
     }
+
+    @Override
+    public void show(String title, Node content, Node graphic) {
+        if (!Toolkit.getToolkit().canStartNestedEventLoop())
+            throw new IllegalStateException();
+        overlayPane.setVisible(true);
+        dialogHeaderLabel.setText(title);
+        dialogHeaderLabel.setGraphic(graphic);
+        dialogPane.setCenter(content);
+        if (okButton == null)
+            createOkButton();
+        dialogButtonBar.getButtons().setAll(okButton);
+        Toolkit.getToolkit().enterNestedEventLoop(this);
+    }
 }

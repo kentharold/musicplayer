@@ -173,7 +173,7 @@
     -fx-padding: 0;
 }
 
-.table-row-cell .table-cell {
+*.table-row-cell, *.table-cell {
     -fx-blend-mode: hard-light;
     -fx-text-fill: derive(-fx-base, -50%);
     -fx-fill: derive(-fx-base, -50%);

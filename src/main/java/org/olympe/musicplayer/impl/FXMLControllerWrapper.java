@@ -1,15 +1,14 @@
 package org.olympe.musicplayer.impl;
 
-import com.github.scribejava.core.builder.ServiceBuilder;
-import com.github.scribejava.core.model.Token;
-import com.github.scribejava.core.model.Verifier;
-import com.github.scribejava.core.oauth.OAuthService;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
@@ -24,11 +23,10 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.converter.DefaultStringConverter;
 import jfxtras.labs.util.Util;
+import org.controlsfx.control.PropertySheet;
 import org.jaudiotagger.tag.TagField;
 import org.olympe.musicplayer.MusicPlayerApplication;
 import org.olympe.musicplayer.MusicPlayerController;
-import org.olympe.musicplayer.genius.Genius;
-import org.olympe.musicplayer.genius.GeniusApi;
 import org.olympe.musicplayer.impl.control.AudioListCell;
 import org.olympe.musicplayer.impl.control.TagTableCell;
 import org.olympe.musicplayer.impl.util.FileNameStringConverter;
@@ -102,13 +100,15 @@ public class FXMLControllerWrapper {
     private Preferences viewPreferences;
     private Preferences playerPreferences;
 
-    private Genius genius;
-
     public FXMLControllerWrapper(MusicPlayerController controller, Stage primaryStage, MusicPlayerApplication musicPlayerApplication) {
         this.controller = controller;
         this.stage = primaryStage;
         this.musicPlayerApplication = musicPlayerApplication;
         initPreferences();
+    }
+
+    public MusicPlayerApplication getMusicPlayerApplication() {
+        return musicPlayerApplication;
     }
 
     @FXML
@@ -141,10 +141,10 @@ public class FXMLControllerWrapper {
         muteToggleBtn.selectedProperty().bindBidirectional(controller.muteProperty());
         volumeSlider.valueProperty().bindBidirectional(controller.volumeProperty());
         volumeSlider.disableProperty().bind(muteToggleBtn.selectedProperty());
-        coverView.imageProperty().bind(controller.coverImageProperty());
         BorderPane coverParent = (BorderPane) coverView.getParent();
-        coverView.fitWidthProperty().bind(coverParent.widthProperty());
-        coverView.fitHeightProperty().bind(coverParent.heightProperty());
+        coverView.fitWidthProperty().bind(coverParent.prefWidthProperty());
+        coverView.fitHeightProperty().bind(coverParent.prefHeightProperty());
+        coverView.imageProperty().bind(controller.coverImageProperty());
         Circle circleClip = new Circle();
         // coverParent.setClip(circleClip);
         circleClip.radiusProperty().bind(Bindings.min(coverParent.widthProperty().divide(2), coverParent.heightProperty().divide(2)));
@@ -193,34 +193,6 @@ public class FXMLControllerWrapper {
         controller.musicFileTagProperty().addListener((observable1, oldValue1, newValue1) -> {
             if (newValue1 != null) {
                 tagsView.setItems(FXCollections.observableArrayList(newValue1.getTagFields()));
-                if (false && genius == null)
-                {
-                    String secretState = "secret" + new Random().nextInt(999_999);
-                    String apiKey = "Z6rpk9Dor60GpN_r-0z1jiPg2AIhpG7e7R2IM5Lv5gjA6Qj8BG44I2kulZkMfNgY";
-                    String apiSecret = "_S8D-nB84IyJ9nb7FdSvmDIBNF-YN6AO46eAQozyCb6VWEeJCKwUImfwwJgONuYzkE4LOA8dGiN3ulcransiNQ";
-                    OAuthService service = new ServiceBuilder().apiKey(apiKey)
-                            .apiSecret(apiSecret)
-                            .state(secretState)
-                            .scope("me")
-                            .provider(GeniusApi.class)
-                            .callback("http://localhost:8080/ws/oauth")
-                            .build();
-                    Token reqToken = null;
-                    String url = service.getAuthorizationUrl(reqToken);
-                    musicPlayerApplication.getHostServices().showDocument(url);
-                    String value = notifier.askString("Enter verifier: ");
-                    if (value == null)
-                        return;
-                    Verifier verifier = new Verifier(value);
-                    try
-                    {
-                        Token accessToken = service.getAccessToken(reqToken, verifier);
-                        System.out.println(accessToken);
-                        genius = new Genius();
-                    } catch (Throwable e) {
-                        e.printStackTrace();
-                    }
-                }
             }
         });
         // or try to set the cover image as root background image.
@@ -232,6 +204,39 @@ public class FXMLControllerWrapper {
             }
         });
         Platform.runLater(this::initializeAccelerators);
+    }
+
+    @FXML
+    void maximizeWindow() {
+        stage.setMaximized(!stage.isMaximized());
+    }
+
+    @FXML
+    void showAppInfo() {
+        notifier.inform("This app is develop by Kent Harold M.");
+    }
+
+    @FXML
+    void showMonitor() {
+        Runtime rt = Runtime.getRuntime();
+        long total = rt.totalMemory();
+        total /= 1024 * 1024;
+        long used = rt.totalMemory() - rt.freeMemory();
+        used /= 1024 * 1024;
+        notifier.inform(String.format("Memory used / Memory total (in Mb): %s / %s", used, total));
+    }
+
+    @FXML
+    void showHelp() {
+        notifier.inform("Help content for Olympe Music Player is coming soon.");
+    }
+
+    @FXML
+    void showOptions() {
+        PropertySheet sheet = new PropertySheet();
+        Node content = sheet;
+        Node graphic = new FontAwesomeIconView(FontAwesomeIcon.COG);
+        notifier.show("Options", content, graphic);
     }
 
     private void initializeAccelerators() {
@@ -406,11 +411,14 @@ public class FXMLControllerWrapper {
         playerPreferences.putBoolean("isRepeatSelected", repeatToggleBtn.isSelected());
         playerPreferences.putBoolean("isRepeatIndeterminate", repeatToggleBtn.isIndeterminate());
         playerPreferences.putDouble("volume", volumeSlider.getValue());
+        int count = musicFilesView.getItems().size();
         Stream<File> files = musicFilesView.getItems().stream();
-        String data = String.join(File.pathSeparator, files.map(File::getAbsolutePath).collect(Collectors.toList()));
-        playerPreferences.putByteArray("last-opened", data.getBytes(Charset.defaultCharset()));
-        playerPreferences.putInt("last-played", controller.currentIndexProperty().get());
-        playerPreferences.putDouble("last-time", controller.currentDurationProperty().get());
+        if (count > 0) {
+            String data = String.join(File.pathSeparator, files.map(File::getAbsolutePath).collect(Collectors.toList()));
+            playerPreferences.putByteArray("last-opened", data.getBytes(Charset.defaultCharset()));
+            playerPreferences.putInt("last-played", controller.currentIndexProperty().get());
+            playerPreferences.putDouble("last-time", controller.currentDurationProperty().get());
+        }
     }
 
     private void restoreState() {
@@ -427,10 +435,12 @@ public class FXMLControllerWrapper {
         repeatToggleBtn.setIndeterminate(playerPreferences.getBoolean("isRepeatIndeterminate", false));
         volumeSlider.setValue(playerPreferences.getDouble("volume", 0.5));
         byte[] bytes = playerPreferences.getByteArray("last-opened", null);
-        if (bytes != null) {
-            String data = new String(bytes, Charset.defaultCharset());
+        String data = null;
+        if (bytes != null)
+            data = new String(bytes, Charset.defaultCharset());
+        if (data != null && !(data = data.trim()).isEmpty()) {
             String[] filePathnames = data.split(File.pathSeparator);
-            Stream<File> files = Stream.of(filePathnames).map(File::new);
+            Stream<File> files = Stream.of(filePathnames).map(String::trim).map(File::new);
             Platform.runLater(() -> {
                 musicFilesView.getItems().addAll(files.collect(Collectors.toList()));
                 controller.gotoTrack(playerPreferences.getInt("last-played", 0));
