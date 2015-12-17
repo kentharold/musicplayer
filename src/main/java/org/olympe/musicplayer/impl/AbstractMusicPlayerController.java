@@ -126,6 +126,7 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
                             MediaPlayer player = new MediaPlayer(media);
                             player.setVolume(volume.get());
                             player.setMute(mute.get());
+                            player.setCycleCount(repeat.get() == 2 ? Integer.MAX_VALUE : 1);
                             player.setOnEndOfMedia(() -> {
                                 // player.stop();
                                 currentIndexChangingInternally.set(true);
@@ -203,7 +204,7 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
             if (mediaPlayer == null) {
                 currentIndexChangingInternally.set(true);
                 gotoTrack(+1);
-                currentIndexChangingInternally.set(true);
+                currentIndexChangingInternally.set(false);
             } else {
                 int index = -1;
                 File musicFile = getMusicFileFor(mediaPlayer);
@@ -229,7 +230,7 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
             currentTime.set(0);
             if (newValue != null) {
                 newValue.currentTimeProperty().addListener(currentTimeChangeListener);
-                newValue.totalDurationProperty().addListener(totalTimeChangeListener);
+                newValue.cycleDurationProperty().addListener(totalTimeChangeListener);
 
                 coverImage.set(coversMap.get(newValue));
                 if (newValue.getTotalDuration() != null) {
@@ -258,6 +259,11 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
             }
         }
         return musicFile;
+    }
+
+    @Override
+    public IntegerProperty repeatProperty() {
+        return repeat;
     }
 
     @Override

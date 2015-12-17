@@ -60,4 +60,6 @@ public interface MusicPlayerController {
     ObservableBooleanValue createIsLoadedBindingFor(File item);
 
     ObjectProperty<MusicFileTag> musicFileTagProperty();
+
+    IntegerProperty repeatProperty();
 }

@@ -410,6 +410,7 @@ public class FXMLControllerWrapper {
         playerPreferences.putBoolean("isMuteSelected", muteToggleBtn.isSelected());
         playerPreferences.putBoolean("isRepeatSelected", repeatToggleBtn.isSelected());
         playerPreferences.putBoolean("isRepeatIndeterminate", repeatToggleBtn.isIndeterminate());
+        playerPreferences.putInt("repeat", controller.repeatProperty().get());
         playerPreferences.putDouble("volume", volumeSlider.getValue());
         int count = musicFilesView.getItems().size();
         Stream<File> files = musicFilesView.getItems().stream();
@@ -436,8 +437,9 @@ public class FXMLControllerWrapper {
         volumeSlider.setValue(playerPreferences.getDouble("volume", 0.5));
         byte[] bytes = playerPreferences.getByteArray("last-opened", null);
         String data = null;
-        if (bytes != null)
+        if (bytes != null) {
             data = new String(bytes, Charset.defaultCharset());
+        }
         if (data != null && !(data = data.trim()).isEmpty()) {
             String[] filePathnames = data.split(File.pathSeparator);
             Stream<File> files = Stream.of(filePathnames).map(String::trim).map(File::new);
@@ -445,6 +447,7 @@ public class FXMLControllerWrapper {
                 musicFilesView.getItems().addAll(files.collect(Collectors.toList()));
                 controller.gotoTrack(playerPreferences.getInt("last-played", 0));
                 Platform.runLater(() -> durationSlider.setValue(playerPreferences.getDouble("last-time", 0)));
+                controller.repeatProperty().set(playerPreferences.getInt("repeat", 0));
             });
         }
     }
