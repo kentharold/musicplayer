@@ -21,6 +21,7 @@ import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.datatype.Artwork;
+import org.jaudiotagger.tag.datatype.BooleanByte;
 import org.olympe.musicplayer.MusicPlayerController;
 import org.olympe.musicplayer.impl.util.ColorThief;
 import org.olympe.musicplayer.impl.util.MusicFileTag;
@@ -50,6 +51,7 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
     private LongProperty totalTime = new SimpleLongProperty();
     private BooleanProperty currentDurationChangingInternally = new SimpleBooleanProperty(false);
     private BooleanProperty isPlaying = new SimpleBooleanProperty(false);
+    private BooleanProperty currentIndexChangingInternally = new SimpleBooleanProperty(false);
     private ChangeListener<Duration> totalTimeChangeListener = (observable, oldValue, newValue) -> {
         if (newValue != null) {
             totalTime.set((long) newValue.toMillis());
@@ -59,7 +61,20 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
     private Map<Object, Image> coversCache = new HashMap<>();
     private Map<MediaPlayer, Image> coversMap = new HashMap<>();
     private ObjectProperty<MediaPlayer> currentMediaPlayer = new SimpleObjectProperty<>();
-    private IntegerProperty repeat = new SimpleIntegerProperty(0);
+    // 0 : do not repeat
+    // 1 : repeat playlist
+    // 2 : repeat track
+    private IntegerProperty repeat = new SimpleIntegerProperty(0) {
+        @Override
+        protected void invalidated() {
+            int count = get() == 2 ? Integer.MAX_VALUE : 1;
+            MediaPlayer player = currentMediaPlayer.get();
+            if (player != null) {
+                player.setCycleCount(count);
+            }
+            Platform.runLater(() -> mediaPlayers.values().parallelStream().forEach(mediaPlayer -> mediaPlayer.setCycleCount(count)));
+        }
+    };
     private LongProperty currentTime = new SimpleLongProperty();
     private DoubleProperty currentDuration = new SimpleDoubleProperty(0.0) {
         @Override
@@ -111,7 +126,12 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
                             MediaPlayer player = new MediaPlayer(media);
                             player.setVolume(volume.get());
                             player.setMute(mute.get());
-                            player.setOnEndOfMedia(() -> gotoTrack(+1));
+                            player.setOnEndOfMedia(() -> {
+                                // player.stop();
+                                currentIndexChangingInternally.set(true);
+                                gotoTrack(+1);
+                                currentIndexChangingInternally.set(false);
+                            });
                             mediaPlayers.put(file, player);
                             AudioFile audioFile = AudioFileIO.read(file);
                             Tag tag = audioFile.getTag();
@@ -181,14 +201,20 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
             // update the index property;
             MediaPlayer mediaPlayer = currentMediaPlayer.get();
             if (mediaPlayer == null) {
+                currentIndexChangingInternally.set(true);
                 gotoTrack(+1);
+                currentIndexChangingInternally.set(true);
             } else {
                 int index = -1;
                 File musicFile = getMusicFileFor(mediaPlayer);
                 index = musicFiles.indexOf(musicFile);
                 if (index == -1) {
                     // the current playerwas removed while loaded.
-                    Platform.runLater(() -> gotoTrack(+1));
+                    Platform.runLater(() ->{
+                        currentIndexChangingInternally.set(true);
+                        gotoTrack(+1);
+                        currentIndexChangingInternally.set(false);
+                    });
                 }
                 currentIndex.set(index);
             }
@@ -305,12 +331,18 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
 
     @Override
     public void gotoTrack(int offset) {
-        int index = currentIndex.get() + offset;
-        index = index % musicFiles.getSize();
-        File file = musicFiles.get(index);
-        MediaPlayer player = mediaPlayers.get(file);
-        currentMediaPlayer.set(player);
-        currentIndex.set(index);
+        if (!currentIndexChangingInternally.get() || repeat.get() != 2) {
+            int index = currentIndex.get() + offset;
+            if (repeat.get() == 1)
+                index = index % musicFiles.getSize();
+            if (index >= 0 && index < musicFiles.size())
+            {
+                File file = musicFiles.get(index);
+                MediaPlayer player = mediaPlayers.get(file);
+                currentMediaPlayer.set(player);
+                currentIndex.set(index);
+            }
+        }
     }
 
     @Override
@@ -325,7 +357,7 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
 
     @Override
     public ObservableBooleanValue canGotoNextTract() {
-        return Bindings.isNotEmpty(musicFiles).and(currentIndex.lessThan(Bindings.size(musicFiles).subtract(1)));
+        return Bindings.isNotEmpty(musicFiles).and(repeat.isEqualTo(1).or(currentIndex.lessThan(Bindings.size(musicFiles).subtract(1))));
     }
 
     @Override
