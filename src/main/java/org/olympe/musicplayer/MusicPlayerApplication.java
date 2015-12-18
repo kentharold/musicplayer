@@ -3,6 +3,7 @@ package org.olympe.musicplayer;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -11,6 +12,7 @@ import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.tag.id3.AbstractID3Tag;
 import org.olympe.musicplayer.impl.DefaultMusicPlayerController;
 import org.olympe.musicplayer.impl.FXMLControllerWrapper;
+import org.olympe.musicplayer.impl.fxml.FXMLController;
 
 import java.io.IOException;
 import java.net.URL;
@@ -49,8 +51,8 @@ public class MusicPlayerApplication extends Application {
         ResourceBundle resources = ResourceBundle.getBundle(I18N_NAME);
         loader.setResources(resources);
         MusicPlayerController controller = new DefaultMusicPlayerController();
-        loader.setController(new FXMLControllerWrapper(controller, primaryStage, this));
-        StackPane root = loader.load();
+        loader.setController(new FXMLController(this, primaryStage));
+        AnchorPane root = loader.load();
         Scene scene = new Scene(root);
         location = ClassLoader.getSystemResource(CSS_NAME);
         scene.getStylesheets().add(location.toExternalForm());

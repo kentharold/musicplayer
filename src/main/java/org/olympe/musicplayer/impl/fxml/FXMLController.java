@@ -101,11 +101,6 @@ public class FXMLController extends AbstractUndecoratedFXMLController {
     }
 
     @Override
-    void onMouseMoved(MouseEvent event) {
-
-    }
-
-    @Override
     void onMouseReleased(MouseEvent event) {
 
     }
