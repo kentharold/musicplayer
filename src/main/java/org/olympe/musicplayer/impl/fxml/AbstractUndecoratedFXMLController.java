@@ -6,7 +6,6 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.BoundingBox;
-import javafx.geometry.Bounds;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
@@ -138,13 +137,13 @@ public abstract class AbstractUndecoratedFXMLController extends AbstractFXMLCont
             double height = stage.getHeight() + (north ? -1 : +1) * (event.getScreenY() - mouseDragOffsetY);
             double x = stage.getX() + event.getScreenX() - mouseDragOffsetX;
             double y = stage.getY() + event.getScreenY() - mouseDragOffsetY;
-            if (north || south)
+            if ((north || south) && height >= stage.getMinHeight())
                 stage.setHeight(height);
-            else if (east || west)
+            if ((east || west) && width >= stage.getMinWidth())
                 stage.setWidth(width);
-            if (west)
+            if (west && x >= 0)
                 stage.setX(x);
-            if (north) {
+            if (north && y >= 0) {
                 Rectangle2D rect = new Rectangle2D(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
                 ObservableList<Screen> screensForRectangle = Screen.getScreensForRectangle(rect);
                 if (screensForRectangle.size() > 0) {
@@ -169,7 +168,7 @@ public abstract class AbstractUndecoratedFXMLController extends AbstractFXMLCont
             return;
         Object source = event.getSource();
         Stage stage = getStage();
-        if (source == titlebarHbox && !stage.isFullScreen()) {
+        if (source == titlebarHbox && !isResizeCursor(root.getCursor()) && !stage.isFullScreen()) {
             if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
                 toggleMaximized();
                 event.consume();
@@ -220,6 +219,10 @@ public abstract class AbstractUndecoratedFXMLController extends AbstractFXMLCont
     // Maximized state of the window.
     //
 
+    public final boolean isMaximized() {
+        return maximized;
+    }
+
     public final void setMaximized(boolean maximized) {
         Stage stage = getStage();
         if (!Platform.isFxApplicationThread()) {
@@ -247,10 +250,6 @@ public abstract class AbstractUndecoratedFXMLController extends AbstractFXMLCont
         }
     }
 
-    public final boolean isMaximized() {
-        return maximized;
-    }
-
     public final void toggleMaximized() {
         setMaximized(!isMaximized());
     }
@@ -259,16 +258,16 @@ public abstract class AbstractUndecoratedFXMLController extends AbstractFXMLCont
     // Minimized state of the window.
     //
 
+    public final boolean isMinimized() {
+        return getStage().isIconified();
+    }
+
     public final void setMinimized(boolean minimized) {
         if (!Platform.isFxApplicationThread()) {
             Platform.runLater(() -> setMinimized(minimized));
             return;
         }
         getStage().setIconified(minimized);
-    }
-
-    public final boolean isMinimized() {
-        return getStage().isIconified();
     }
 
     public final void toggleMinimized() {
@@ -279,16 +278,16 @@ public abstract class AbstractUndecoratedFXMLController extends AbstractFXMLCont
     // Full screen state of the window.
     //
 
+    public final boolean isFullScreen() {
+        return getStage().isFullScreen();
+    }
+
     public final void setFullScreen(boolean fullScreen) {
         if (!Platform.isFxApplicationThread()) {
             Platform.runLater(() -> setFullScreen(fullScreen));
             return;
         }
         getStage().setFullScreen(fullScreen);
-    }
-
-    public final boolean isFullScreen() {
-        return getStage().isFullScreen();
     }
 
     public final void toggleFullScreen() {
