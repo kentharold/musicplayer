@@ -69,6 +69,13 @@ public abstract class AbstractUndecoratedFXMLController extends AbstractFXMLCont
         }
     }
 
+    private boolean isResizeCursor(Cursor cursor) {
+        List<Cursor> cursors = Arrays.asList(Cursor.N_RESIZE, Cursor.NE_RESIZE,
+                Cursor.NW_RESIZE, Cursor.S_RESIZE, Cursor.SW_RESIZE, Cursor.SE_RESIZE,
+                Cursor.W_RESIZE, Cursor.E_RESIZE);
+        return cursors.contains(cursor);
+    }
+
     @Override
     void onMousePressed(MouseEvent event) {
         if (event.isConsumed())
@@ -76,10 +83,7 @@ public abstract class AbstractUndecoratedFXMLController extends AbstractFXMLCont
         Object source = event.getSource();
         if (source == root) {
             Cursor cursor = root.getCursor();
-            List<Cursor> cursors = Arrays.asList(Cursor.N_RESIZE, Cursor.NE_RESIZE,
-                    Cursor.NW_RESIZE, Cursor.S_RESIZE, Cursor.SW_RESIZE, Cursor.SE_RESIZE,
-                    Cursor.W_RESIZE, Cursor.E_RESIZE);
-            if (!cursors.contains(cursor))
+            if (!isResizeCursor(cursor))
                 return;
         }
         if ((source == titlebarHbox || source == root) && event.isPrimaryButtonDown()) {
@@ -96,11 +100,9 @@ public abstract class AbstractUndecoratedFXMLController extends AbstractFXMLCont
     void onMouseDragged(MouseEvent event) {
         if (event.isConsumed())
             return;
-        Object source = event.getSource();
         Stage stage = getStage();
-        if (stage.isFullScreen() || stage.isMaximized())
-            return;
-        if (source == titlebarHbox && titlebarHbox.getCursor() == Cursor.DEFAULT && event.isPrimaryButtonDown() && mouseDragOffsetX != -1 && mouseDragOffsetY != -1 && !isFullScreen()) {
+        Object source = event.getSource();
+        if (source == titlebarHbox && !isResizeCursor(root.getCursor()) && event.isPrimaryButtonDown() && mouseDragOffsetX != -1 && mouseDragOffsetY != -1 && !isFullScreen()) {
             if (isMaximized()) {
                 setMaximized(false);
                 stage.setX(event.getScreenX() - stage.getWidth() / 2);
@@ -131,16 +133,32 @@ public abstract class AbstractUndecoratedFXMLController extends AbstractFXMLCont
                 east = true;
             if (cursor == Cursor.W_RESIZE || cursor == Cursor.NW_RESIZE || cursor == Cursor.SW_RESIZE)
                 west = true;
-            double width = stage.getWidth() + event.getScreenX() - mouseDragOffsetX;
-            double height = stage.getHeight() + event.getScreenY() - mouseDragOffsetY;
+
+            double width = stage.getWidth() + (west ? -1 : +1) * (event.getScreenX() - mouseDragOffsetX);
+            double height = stage.getHeight() + (north ? -1 : +1) * (event.getScreenY() - mouseDragOffsetY);
             double x = stage.getX() + event.getScreenX() - mouseDragOffsetX;
+            double y = stage.getY() + event.getScreenY() - mouseDragOffsetY;
             if (north || south)
                 stage.setHeight(height);
             else if (east || west)
                 stage.setWidth(width);
-
-            if (north || west)
+            if (west)
                 stage.setX(x);
+            if (north) {
+                Rectangle2D rect = new Rectangle2D(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
+                ObservableList<Screen> screensForRectangle = Screen.getScreensForRectangle(rect);
+                if (screensForRectangle.size() > 0) {
+                    Screen screen = screensForRectangle.get(0);
+                    Rectangle2D visualBounds = screen.getVisualBounds();
+                    if (y < visualBounds.getHeight() - 30 && y >= visualBounds.getMinY()) {
+                        stage.setY(y);
+                    }
+                }
+            }
+
+            mouseDragOffsetX = event.getScreenX();
+            mouseDragOffsetY = event.getScreenY();
+
             event.consume();
         }
     }
