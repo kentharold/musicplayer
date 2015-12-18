@@ -14,9 +14,9 @@ public abstract class AbstractFXMLController {
     private final Application application;
     private final Stage stage;
     @FXML
-    protected ResourceBundle resources;
+    private ResourceBundle resources;
     @FXML
-    protected URL location;
+    private URL location;
 
     public AbstractFXMLController(Application application, Stage stage) {
         this.application = application;
