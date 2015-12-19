@@ -29,31 +29,8 @@ public abstract class AbstractMusicPlayerFXMLController extends AudioListFXMLCon
         currentDuration = new SimpleLongProperty(this, "currentDuration", 0);
         totalDuration = new SimpleLongProperty(this, "totalDuration", 0);
         currentProgress = new SimpleDoubleProperty(this, "currentProgress", 0);
-        loadedMediaPlayer = new SimpleObjectProperty<MediaPlayer>(this, "loadedMediaPlayer");
+        loadedMediaPlayer = new SimpleObjectProperty<>(this, "loadedMediaPlayer");
         loadedMediaPlayer.addListener((observable, oldValue, newValue) -> updateMediaPlayer(oldValue, newValue));
-    }
-
-    public final void stepForward() {
-        stop();
-        step(+1);
-        setPlay(isPlaySelected());
-    }
-
-    public final void stepBackward() {
-        stop();
-        step(-1);
-        setPlay(isPlaySelected());
-    }
-
-    public final void stop() {
-        MediaPlayer mediaPlayer = getLoadedMediaPlayer();
-        if (mediaPlayer != null)
-            mediaPlayer.stop();
-    }
-
-    public final boolean isPlaying() {
-        MediaPlayer mediaPlayer = getLoadedMediaPlayer();
-        return mediaPlayer != null && mediaPlayer.getStatus() == PLAYING;
     }
 
     @Override
@@ -88,6 +65,29 @@ public abstract class AbstractMusicPlayerFXMLController extends AudioListFXMLCon
         mediaPlayer.setOnStalled(null);
         mediaPlayer.setOnStopped(null);
         mediaPlayer.dispose();
+    }
+
+    public final void stepForward() {
+        stop();
+        step(+1);
+        setPlay(isPlaySelected());
+    }
+
+    public final void stepBackward() {
+        stop();
+        step(-1);
+        setPlay(isPlaySelected());
+    }
+
+    public final void stop() {
+        MediaPlayer mediaPlayer = getLoadedMediaPlayer();
+        if (mediaPlayer != null)
+            mediaPlayer.stop();
+    }
+
+    public final boolean isPlaying() {
+        MediaPlayer mediaPlayer = getLoadedMediaPlayer();
+        return mediaPlayer != null && mediaPlayer.getStatus() == PLAYING;
     }
 
     public final void toggleRepeat() {
