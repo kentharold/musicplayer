@@ -4,15 +4,10 @@ import javafx.application.Application;
 import javafx.scene.input.*;
 import javafx.stage.Stage;
 
-public class FXMLController extends AbstractUndecoratedFXMLController {
+public class FXMLController extends MusicPlayerFXMLController {
 
     public FXMLController(Application application, Stage stage) {
         super(application, stage);
-    }
-
-    @Override
-    void initialize() {
-
     }
 
     @Override
@@ -26,22 +21,12 @@ public class FXMLController extends AbstractUndecoratedFXMLController {
     }
 
     @Override
-    void onDragDropped(DragEvent event) {
-
-    }
-
-    @Override
     void onDragEntered(DragEvent event) {
 
     }
 
     @Override
     void onDragExited(DragEvent event) {
-
-    }
-
-    @Override
-    void onDragOver(DragEvent event) {
 
     }
 
@@ -189,4 +174,45 @@ public class FXMLController extends AbstractUndecoratedFXMLController {
     void onZoomFinished(ZoomEvent event) {
 
     }
+
+    @Override
+    protected void onStopped() {
+
+    }
+
+    @Override
+    protected void onStalled() {
+
+    }
+
+    @Override
+    protected void onRepeat() {
+
+    }
+
+    @Override
+    protected void onReady() {
+
+    }
+
+    @Override
+    protected void onPlaying() {
+
+    }
+
+    @Override
+    protected void onPaused() {
+
+    }
+
+    @Override
+    protected void onHalted() {
+
+    }
+
+    @Override
+    protected void onErrorMedia() {
+
+    }
+
 }

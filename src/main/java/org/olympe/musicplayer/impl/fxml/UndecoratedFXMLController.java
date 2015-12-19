@@ -24,7 +24,7 @@ import java.util.List;
  * to toggle the window to full screen, minimize,
  * maximize, resize, move or close it.
  */
-public abstract class AbstractUndecoratedFXMLController extends AbstractFXMLController {
+public abstract class UndecoratedFXMLController extends AbstractFXMLController {
 
     @FXML
     private Button fullscreenButton;
@@ -44,7 +44,7 @@ public abstract class AbstractUndecoratedFXMLController extends AbstractFXMLCont
     private BoundingBox savedBounds;
     private boolean maximized = false;
 
-    public AbstractUndecoratedFXMLController(Application application, Stage stage) {
+    public UndecoratedFXMLController(Application application, Stage stage) {
         super(application, stage);
     }
 

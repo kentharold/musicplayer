@@ -23,19 +23,19 @@ public abstract class AbstractFXMLController {
         this.stage = stage;
     }
 
-    public Application getApplication() {
+    public final Application getApplication() {
         return application;
     }
 
-    public Stage getStage() {
+    public final Stage getStage() {
         return stage;
     }
 
-    public ResourceBundle getResources() {
+    public final ResourceBundle getResources() {
         return resources;
     }
 
-    public URL getLocation() {
+    public final URL getLocation() {
         return location;
     }
 

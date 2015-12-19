@@ -21,7 +21,6 @@ import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.datatype.Artwork;
-import org.jaudiotagger.tag.datatype.BooleanByte;
 import org.olympe.musicplayer.MusicPlayerController;
 import org.olympe.musicplayer.impl.util.ColorThief;
 import org.olympe.musicplayer.impl.util.MusicFileTag;
@@ -290,14 +289,14 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
     @Override
     public void seek(double value) {
         MediaPlayer player = currentMediaPlayer.get();
-        if (player != null) {
+        /*if (player != null) {
             Platform.runLater(() -> {
                 // can only seek when the player is ready.
                 player.seek(Duration.millis((value / 100) * totalTime.get()));
                 if (player.getStatus() != MediaPlayer.Status.PLAYING)
                     currentTime.set((long) ((value / 100) * totalTime.get()));
             });
-        }
+        }*/
     }
 
     @Override
