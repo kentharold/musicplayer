@@ -12,7 +12,7 @@ public class AudioStringConverter extends StringConverter<Audio> {
     public String toString(Audio object) {
         if (object == null)
             return null;
-        return object.toString();
+        return object.getFile().getName();
     }
 
     @Override

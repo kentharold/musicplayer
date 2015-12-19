@@ -13,6 +13,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.olympe.musicplayer.Audio;
+import org.olympe.musicplayer.impl.util.AudioStringConverter;
 
 import java.io.File;
 import java.io.IOException;
@@ -77,7 +78,8 @@ public abstract class AudioListFXMLController extends ListViewFXMLController<Aud
     @Override
     protected final Callback<ListView<Audio>, ListCell<Audio>> createCellFactoryFor(ListView<Audio> listView) {
         return param -> {
-            TextFieldListCell listCell = new TextFieldListCell<>();
+            TextFieldListCell<Audio> listCell = new TextFieldListCell<>();
+            listCell.setConverter(new AudioStringConverter());
             listCell.setOnMouseClicked(this::onMouseClicked);
             return listCell;
         };

@@ -112,7 +112,10 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
             Object obj = listCell.getItem();
             if (obj instanceof Audio) {
                 Audio audio = (Audio) obj;
+                stop();
                 step(audio);
+                if (isPlaySelected())
+                    audio.getMediaPlayer().play();
                 event.consume();
             }
         }
