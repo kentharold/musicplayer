@@ -1,9 +1,11 @@
-package org.olympe.musicplayer.impl.fxml;
+package org.olympe.musicplayer.fxml;
 
-import com.sun.javafx.tk.Toolkit;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -14,17 +16,18 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+
 import org.controlsfx.control.PropertySheet;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
+import com.sun.javafx.tk.Toolkit;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 
 /**
  *
  */
-public abstract class InternalNotifierFXMLController extends UndecoratedFXMLController {
-
+public abstract class InternalNotifierFXMLController extends UndecoratedFXMLController
+{
     @FXML
     private StackPane overlayPane;
     @FXML
@@ -35,24 +38,51 @@ public abstract class InternalNotifierFXMLController extends UndecoratedFXMLCont
     private HBox notifierHeader;
     @FXML
     private Label notifierHeaderLabel;
-
     private Button okButton;
     private Button closeButton;
 
-    public InternalNotifierFXMLController(Application application, Stage stage) {
+    public InternalNotifierFXMLController(Application application, Stage stage)
+    {
         super(application, stage);
     }
 
     @Override
-    protected void showOptions(PropertySheet sheet) {
+    protected void showOptions(PropertySheet sheet)
+    {
         String title = localize("Options.name");
         Node graphic = new FontAwesomeIconView(FontAwesomeIcon.COG);
         notify(title, graphic, sheet, ButtonData.CANCEL_CLOSE);
     }
 
-    private Object notify(String title, Node graphic, Object content, ButtonData... buttons) {
+    @Override
+    void onAction(ActionEvent event)
+    {
+        super.onAction(event);
+        if (event.isConsumed())
+            return;
+        Object source = event.getSource();
+        if (source == okButton)
+        {
+            // TODO: return the asked value.
+        }
+        Object ret = null;
+        if (source == okButton || source == closeButton)
+        {
+            setNotifierVisible(false);
+            Toolkit.getToolkit().exitNestedEventLoop(this, ret);
+            event.consume();
+        }
+    }
+
+    private Object notify(String title, Node graphic, Object content, ButtonData... buttons)
+    {
         if (!Toolkit.getToolkit().canStartNestedEventLoop())
+            throw new IllegalStateException();
+        if (Toolkit.getToolkit().isNestedLoopRunning())
+        {
+            logger.warning("the notifier is already running.");
             return null;
+        }
         setNotifierVisible(true);
         setNotifierTitle(title);
         setNotifierGraphic(graphic);
@@ -61,41 +91,48 @@ public abstract class InternalNotifierFXMLController extends UndecoratedFXMLCont
         return Toolkit.getToolkit().enterNestedEventLoop(this);
     }
 
-    private void setNotifierVisible(boolean visible) {
+    private void setNotifierVisible(boolean visible)
+    {
         overlayPane.setVisible(visible);
     }
 
-    private void setNotifierTitle(String title) {
+    private void setNotifierTitle(String title)
+    {
         notifierHeaderLabel.setText(title);
     }
 
-    private void setNotifierGraphic(Node graphic) {
+    private void setNotifierGraphic(Node graphic)
+    {
         notifierHeaderLabel.setGraphic(graphic);
     }
 
-    private void setNotifierContent(Object content) {
+    private void setNotifierContent(Object content)
+    {
         Node node = null;
-        if (content instanceof String) {
+        if (content instanceof String)
+        {
             Label lbl = new Label((String) content);
             lbl.setWrapText(true);
             node = lbl;
-        } else if (content instanceof Node)
+        }
+        else if (content instanceof Node)
             node = (Node) content;
         notifierContainer.setCenter(node);
     }
 
-    private void setNotifierButtons(ButtonData... notifierButtons) {
+    private void setNotifierButtons(ButtonData... notifierButtons)
+    {
         List<Button> buttons = new ArrayList<>();
         Stream<ButtonData> stream = Stream.of(notifierButtons);
-        stream.forEach(buttonData -> {
-            buttons.add(getOrCreateButton(buttonData));
-        });
+        stream.forEach(buttonData -> buttons.add(getOrCreateButton(buttonData)));
         notifierButtonBar.getButtons().setAll(buttons);
     }
 
-    private Button getOrCreateButton(ButtonData buttonData) {
+    private Button getOrCreateButton(ButtonData buttonData)
+    {
         Button button = null;
-        switch (buttonData) {
+        switch (buttonData)
+        {
             case OK_DONE:
                 button = getOrCreateOkButton();
                 break;
@@ -108,8 +145,10 @@ public abstract class InternalNotifierFXMLController extends UndecoratedFXMLCont
         return button;
     }
 
-    private Button getOrCreateOkButton() {
-        if (okButton == null) {
+    private Button getOrCreateOkButton()
+    {
+        if (okButton == null)
+        {
             okButton = new Button(localize("OkButton.name"));
             ButtonBar.setButtonData(okButton, ButtonData.OK_DONE);
             okButton.setOnAction(this::onAction);
@@ -117,8 +156,10 @@ public abstract class InternalNotifierFXMLController extends UndecoratedFXMLCont
         return okButton;
     }
 
-    private Button getOrCreateCloseButton() {
-        if (closeButton == null) {
+    private Button getOrCreateCloseButton()
+    {
+        if (closeButton == null)
+        {
             closeButton = new Button(localize("CloseButton.name"));
             ButtonBar.setButtonData(closeButton, ButtonData.CANCEL_CLOSE);
             closeButton.setOnAction(this::onAction);

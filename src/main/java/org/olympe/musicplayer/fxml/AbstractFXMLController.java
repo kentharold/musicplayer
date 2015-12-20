@@ -1,4 +1,9 @@
-package org.olympe.musicplayer.impl.fxml;
+package org.olympe.musicplayer.fxml;
+
+import java.net.URL;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -15,16 +20,10 @@ import javafx.scene.input.TouchEvent;
 import javafx.scene.input.ZoomEvent;
 import javafx.stage.Stage;
 
-import java.net.URL;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
-import java.util.logging.Logger;
-
-public abstract class AbstractFXMLController {
-
-    protected static final Logger logger = Logger.getLogger("FXML-Controller");
-    private static AbstractFXMLController localizator;
-
+public abstract class AbstractFXMLController
+{
+    protected static final Logger logger = Logger.getLogger("FXMLController");
+    private static AbstractFXMLController controller;
     private final Application application;
     private final Stage stage;
     @FXML
@@ -32,18 +31,24 @@ public abstract class AbstractFXMLController {
     @FXML
     private URL location;
 
-    public AbstractFXMLController(Application application, Stage stage) {
-        localizator = this;
+    public AbstractFXMLController(Application application, Stage stage)
+    {
+        controller = this;
         this.application = application;
         this.stage = stage;
     }
 
-    public static String localize(String key) {
+    public static String localize(String key)
+    {
         String result = null;
-        if (localizator != null && localizator.resources != null) {
-            try {
-                result = localizator.resources.getString(key);
-            } catch (MissingResourceException e) {
+        if (controller != null && controller.resources != null)
+        {
+            try
+            {
+                result = controller.resources.getString(key);
+            }
+            catch (MissingResourceException e)
+            {
                 logger.warning(e.getLocalizedMessage());
             }
         }
@@ -52,27 +57,21 @@ public abstract class AbstractFXMLController {
         return result;
     }
 
-    public final Application getApplication() {
+    public final Application getApplication()
+    {
         return application;
     }
 
-    public final Stage getStage() {
+    public final Stage getStage()
+    {
         return stage;
     }
 
     @FXML
     abstract void initialize();
 
-    //
-    // Main Event Handlers.
-    //
-
     @FXML
     abstract void onAction(ActionEvent event);
-
-    //
-    // Drag/Drop Event Handlers.
-    //
 
     @FXML
     abstract void onDragDetected(MouseEvent event);
@@ -104,10 +103,6 @@ public abstract class AbstractFXMLController {
     @FXML
     abstract void onMouseDragReleased(MouseEvent event);
 
-    //
-    // Keyboard Event Handlers.
-    //
-
     @FXML
     abstract void onInputMethodTextChanged(InputMethodEvent event);
 
@@ -119,10 +114,6 @@ public abstract class AbstractFXMLController {
 
     @FXML
     abstract void onKeyTyped(KeyEvent event);
-
-    //
-    // Mouse Event Handlers.
-    //
 
     @FXML
     abstract void onContextMenuRequested(ContextMenuEvent event);
@@ -157,10 +148,6 @@ public abstract class AbstractFXMLController {
     @FXML
     abstract void onScrollFinished(ScrollEvent event);
 
-    //
-    // Rotation Event Handlers.
-    //
-
     @FXML
     abstract void onRotate(RotateEvent event);
 
@@ -169,10 +156,6 @@ public abstract class AbstractFXMLController {
 
     @FXML
     abstract void onRotationFinished(RotateEvent event);
-
-    //
-    // Swipe Event Handlers.
-    //
 
     @FXML
     abstract void onSwipeLeft(SwipeEvent event);
@@ -186,10 +169,6 @@ public abstract class AbstractFXMLController {
     @FXML
     abstract void onSwipeDown(SwipeEvent event);
 
-    //
-    // Touch Event Handlers.
-    //
-
     @FXML
     abstract void onTouchMoved(TouchEvent event);
 
@@ -201,10 +180,6 @@ public abstract class AbstractFXMLController {
 
     @FXML
     abstract void onTouchStationary(TouchEvent event);
-
-    //
-    // Zoom Event Handlers.
-    //
 
     @FXML
     abstract void onZoom(ZoomEvent event);

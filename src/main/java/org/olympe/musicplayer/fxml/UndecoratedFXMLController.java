@@ -1,4 +1,9 @@
-package org.olympe.musicplayer.impl.fxml;
+package org.olympe.musicplayer.fxml;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -15,23 +20,19 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+
 import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.property.BeanPropertyUtils;
-import org.olympe.musicplayer.impl.fxml.configurator.WindowConfigurator;
-import org.olympe.musicplayer.impl.util.BeanPropertyWrapper;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import org.olympe.musicplayer.bean.configurator.WindowConfigurator;
+import org.olympe.musicplayer.util.BeanPropertyWrapper;
 
 /**
- * This controller abstraction allows the end user
- * to toggle the window to full screen, minimize,
- * maximize, resize, move or close it.
+ * This controller abstraction allows the end user to toggle the window to full screen, minimize, maximize, resize, move
+ * or close it.
  */
-public abstract class UndecoratedFXMLController extends ConfigurableFXMLController {
-
+public abstract class UndecoratedFXMLController extends ConfigurableFXMLController
+{
     @FXML
     private Button fullscreenButton;
     @FXML
@@ -44,73 +45,188 @@ public abstract class UndecoratedFXMLController extends ConfigurableFXMLControll
     private HBox titlebarHbox;
     @FXML
     private Parent root;
-
     private double mouseDragOffsetX;
     private double mouseDragOffsetY;
     private BoundingBox savedBounds;
     private boolean maximized = false;
     private WindowConfigurator configurator = new WindowConfigurator();
 
-    public UndecoratedFXMLController(Application application, Stage stage) {
+    public UndecoratedFXMLController(Application application, Stage stage)
+    {
         super(application, stage);
     }
 
+    public final boolean isMaximized()
+    {
+        return maximized;
+    }
+
+    public final void setMaximized(boolean maximized)
+    {
+        Stage stage = getStage();
+        if (!Platform.isFxApplicationThread())
+        {
+            Platform.runLater(() -> setMaximized(maximized));
+            return;
+        }
+        if (!maximized)
+        {
+            stage.setX(savedBounds.getMinX());
+            stage.setY(savedBounds.getMinY());
+            stage.setWidth(savedBounds.getWidth());
+            stage.setHeight(savedBounds.getHeight());
+            savedBounds = null;
+            this.maximized = false;
+        }
+        else
+        {
+            Rectangle2D rect = new Rectangle2D(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
+            ObservableList<Screen> screensForRectangle = Screen.getScreensForRectangle(rect);
+            Screen screen = screensForRectangle.get(0);
+            Rectangle2D visualBounds = screen.getVisualBounds();
+            savedBounds = new BoundingBox(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
+            stage.setX(visualBounds.getMinX());
+            stage.setY(visualBounds.getMinY());
+            stage.setWidth(visualBounds.getWidth());
+            stage.setHeight(visualBounds.getHeight());
+            this.maximized = true;
+        }
+    }
+
+    public final void toggleMaximized()
+    {
+        setMaximized(!isMaximized());
+    }
+
+    public final boolean isMinimized()
+    {
+        return getStage().isIconified();
+    }
+
+    public final void setMinimized(boolean minimized)
+    {
+        if (!Platform.isFxApplicationThread())
+        {
+            Platform.runLater(() -> setMinimized(minimized));
+            return;
+        }
+        getStage().setIconified(minimized);
+    }
+
+    public final void toggleMinimized()
+    {
+        setMinimized(!isMinimized());
+    }
+    //
+    // Maximized state of the window.
+    //
+
+    public final boolean isFullScreen()
+    {
+        return getStage().isFullScreen();
+    }
+
+    public final void setFullScreen(boolean fullScreen)
+    {
+        if (!Platform.isFxApplicationThread())
+        {
+            Platform.runLater(() -> setFullScreen(fullScreen));
+            return;
+        }
+        getStage().setFullScreen(fullScreen);
+    }
+
+    public final void toggleFullScreen()
+    {
+        setFullScreen(!isFullScreen());
+    }
+    //
+    // Minimized state of the window.
+    //
+
+    public final void exit(int status)
+    {
+        getStage().close();
+        Platform.exit();
+        System.exit(status);
+    }
+
     @Override
-    void onAction(ActionEvent event) {
+    protected void collectOptions(ObservableList<Item> options)
+    {
+        Stream<Item> stream = BeanPropertyUtils.getProperties(configurator).stream();
+        stream = stream.map(BeanPropertyWrapper::new);
+        options.addAll(stream.collect(Collectors.toList()));
+    }
+
+    @Override
+    void onAction(ActionEvent event)
+    {
         super.onAction(event);
         if (event.isConsumed())
             return;
         Object source = event.getSource();
-        if (source == fullscreenButton) {
+        if (source == fullscreenButton)
+        {
             toggleFullScreen();
             event.consume();
-        } else if (source == minimizeButton) {
+        }
+        else if (source == minimizeButton)
+        {
             toggleMinimized();
             event.consume();
-        } else if (source == maximizeButton) {
+        }
+        else if (source == maximizeButton)
+        {
             toggleMaximized();
             event.consume();
-        } else if (source == closeButton) {
+        }
+        else if (source == closeButton)
+        {
             exit(0);
             event.consume(); // should never reach hier.
         }
     }
-
-    private boolean isResizeCursor(Cursor cursor) {
-        List<Cursor> cursors = Arrays.asList(Cursor.N_RESIZE, Cursor.NE_RESIZE,
-                Cursor.NW_RESIZE, Cursor.S_RESIZE, Cursor.SW_RESIZE, Cursor.SE_RESIZE,
-                Cursor.W_RESIZE, Cursor.E_RESIZE);
-        return cursors.contains(cursor);
-    }
+    //
+    // Full screen state of the window.
+    //
 
     @Override
-    void onMousePressed(MouseEvent event) {
+    void onMousePressed(MouseEvent event)
+    {
         if (event.isConsumed())
             return;
         Object source = event.getSource();
-        if (source == root) {
+        if (source == root)
+        {
             Cursor cursor = root.getCursor();
             if (!isResizeCursor(cursor))
                 return;
         }
-        if ((source == titlebarHbox || source == root) && event.isPrimaryButtonDown()) {
+        if ((source == titlebarHbox || source == root) && event.isPrimaryButtonDown())
+        {
             mouseDragOffsetX = event.getScreenX();
             mouseDragOffsetY = event.getScreenY();
             event.consume();
-        } else {
+        }
+        else
+        {
             mouseDragOffsetX = -1;
             mouseDragOffsetY = -1;
         }
     }
 
     @Override
-    void onMouseDragged(MouseEvent event) {
+    void onMouseDragged(MouseEvent event)
+    {
         if (event.isConsumed())
             return;
         Stage stage = getStage();
         Object source = event.getSource();
-        if (source == titlebarHbox && !isResizeCursor(root.getCursor()) && event.isPrimaryButtonDown() && mouseDragOffsetX != -1 && mouseDragOffsetY != -1 && !isFullScreen()) {
-            if (isMaximized()) {
+        if (source == titlebarHbox && !isResizeCursor(root.getCursor()) && event.isPrimaryButtonDown() && mouseDragOffsetX != -1 && mouseDragOffsetY != -1 && !isFullScreen())
+        {
+            if (isMaximized())
+            {
                 setMaximized(false);
                 stage.setX(event.getScreenX() - stage.getWidth() / 2);
                 stage.setY(event.getScreenY());
@@ -124,7 +240,9 @@ public abstract class UndecoratedFXMLController extends ConfigurableFXMLControll
             stage.setX(x);
             stage.setY(y);
             event.consume();
-        } else if (source == root && event.isPrimaryButtonDown() && mouseDragOffsetX != -1 && mouseDragOffsetY != -1 && !isFullScreen() && !isMaximized()) {
+        }
+        else if (source == root && event.isPrimaryButtonDown() && mouseDragOffsetX != -1 && mouseDragOffsetY != -1 && !isFullScreen() && !isMaximized())
+        {
             Cursor cursor = root.getCursor();
             if (cursor == Cursor.DEFAULT || event.isStillSincePress())
                 return;
@@ -140,7 +258,6 @@ public abstract class UndecoratedFXMLController extends ConfigurableFXMLControll
                 east = true;
             if (cursor == Cursor.W_RESIZE || cursor == Cursor.NW_RESIZE || cursor == Cursor.SW_RESIZE)
                 west = true;
-
             double width = stage.getWidth() + (west ? -1 : +1) * (event.getScreenX() - mouseDragOffsetX);
             double height = stage.getHeight() + (north ? -1 : +1) * (event.getScreenY() - mouseDragOffsetY);
             double x = stage.getX() + event.getScreenX() - mouseDragOffsetX;
@@ -151,45 +268,54 @@ public abstract class UndecoratedFXMLController extends ConfigurableFXMLControll
                 stage.setWidth(width);
             if (west && x >= 0)
                 stage.setX(x);
-            if (north && y >= 0) {
+            if (north && y >= 0)
+            {
                 Rectangle2D rect = new Rectangle2D(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
                 ObservableList<Screen> screensForRectangle = Screen.getScreensForRectangle(rect);
-                if (screensForRectangle.size() > 0) {
+                if (screensForRectangle.size() > 0)
+                {
                     Screen screen = screensForRectangle.get(0);
                     Rectangle2D visualBounds = screen.getVisualBounds();
-                    if (y < visualBounds.getHeight() - 30 && y >= visualBounds.getMinY()) {
+                    if (y < visualBounds.getHeight() - 30 && y >= visualBounds.getMinY())
+                    {
                         stage.setY(y);
                     }
                 }
             }
-
             mouseDragOffsetX = event.getScreenX();
             mouseDragOffsetY = event.getScreenY();
-
             event.consume();
         }
     }
 
     @Override
-    void onMouseClicked(MouseEvent event) {
+    void onMouseClicked(MouseEvent event)
+    {
         if (event.isConsumed())
             return;
         Object source = event.getSource();
         Stage stage = getStage();
-        if (source == titlebarHbox && !isResizeCursor(root.getCursor()) && !stage.isFullScreen()) {
-            if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
+        if (source == titlebarHbox && !isResizeCursor(root.getCursor()) && !stage.isFullScreen())
+        {
+            if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2)
+            {
                 toggleMaximized();
                 event.consume();
             }
         }
     }
+    //
+    // Quit the application.
+    //
 
     @Override
-    void onMouseMoved(MouseEvent event) {
+    void onMouseMoved(MouseEvent event)
+    {
         if (event.isConsumed())
             return;
         Object source = event.getSource();
-        if (source == root && !isMaximized() && !isFullScreen()) {
+        if (source == root && !isMaximized() && !isFullScreen())
+        {
             // change the cursor for resize.
             root.setCursor(Cursor.DEFAULT);
             double width = getStage().getWidth();
@@ -214,109 +340,21 @@ public abstract class UndecoratedFXMLController extends ConfigurableFXMLControll
                 root.setCursor(Cursor.S_RESIZE);
             else if (east)
                 root.setCursor(Cursor.E_RESIZE);
-            else if (west) {
+            else if (west)
+            {
                 root.setCursor(Cursor.W_RESIZE);
-            } else {
+            }
+            else
+            {
                 return;
             }
             event.consume();
         }
     }
 
-    //
-    // Maximized state of the window.
-    //
-
-    public final boolean isMaximized() {
-        return maximized;
+    private boolean isResizeCursor(Cursor cursor)
+    {
+        List<Cursor> cursors = Arrays.asList(Cursor.N_RESIZE, Cursor.NE_RESIZE, Cursor.NW_RESIZE, Cursor.S_RESIZE, Cursor.SW_RESIZE, Cursor.SE_RESIZE, Cursor.W_RESIZE, Cursor.E_RESIZE);
+        return cursors.contains(cursor);
     }
-
-    public final void setMaximized(boolean maximized) {
-        Stage stage = getStage();
-        if (!Platform.isFxApplicationThread()) {
-            Platform.runLater(() -> setMaximized(maximized));
-            return;
-        }
-        if (!maximized) {
-            stage.setX(savedBounds.getMinX());
-            stage.setY(savedBounds.getMinY());
-            stage.setWidth(savedBounds.getWidth());
-            stage.setHeight(savedBounds.getHeight());
-            savedBounds = null;
-            this.maximized = false;
-        } else {
-            Rectangle2D rect = new Rectangle2D(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
-            ObservableList<Screen> screensForRectangle = Screen.getScreensForRectangle(rect);
-            Screen screen = screensForRectangle.get(0);
-            Rectangle2D visualBounds = screen.getVisualBounds();
-            savedBounds = new BoundingBox(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
-            stage.setX(visualBounds.getMinX());
-            stage.setY(visualBounds.getMinY());
-            stage.setWidth(visualBounds.getWidth());
-            stage.setHeight(visualBounds.getHeight());
-            this.maximized = true;
-        }
-    }
-
-    public final void toggleMaximized() {
-        setMaximized(!isMaximized());
-    }
-
-    //
-    // Minimized state of the window.
-    //
-
-    public final boolean isMinimized() {
-        return getStage().isIconified();
-    }
-
-    public final void setMinimized(boolean minimized) {
-        if (!Platform.isFxApplicationThread()) {
-            Platform.runLater(() -> setMinimized(minimized));
-            return;
-        }
-        getStage().setIconified(minimized);
-    }
-
-    public final void toggleMinimized() {
-        setMinimized(!isMinimized());
-    }
-
-    //
-    // Full screen state of the window.
-    //
-
-    public final boolean isFullScreen() {
-        return getStage().isFullScreen();
-    }
-
-    public final void setFullScreen(boolean fullScreen) {
-        if (!Platform.isFxApplicationThread()) {
-            Platform.runLater(() -> setFullScreen(fullScreen));
-            return;
-        }
-        getStage().setFullScreen(fullScreen);
-    }
-
-    public final void toggleFullScreen() {
-        setFullScreen(!isFullScreen());
-    }
-
-    //
-    // Quit the application.
-    //
-
-    public final void exit(int status) {
-        getStage().close();
-        Platform.exit();
-        System.exit(status);
-    }
-
-    @Override
-    protected void collectOptions(ObservableList<Item> options) {
-        Stream<Item> stream = BeanPropertyUtils.getProperties(configurator).stream();
-        stream = stream.map(BeanPropertyWrapper::new);
-        options.addAll(stream.collect(Collectors.toList()));
-    }
-
 }
