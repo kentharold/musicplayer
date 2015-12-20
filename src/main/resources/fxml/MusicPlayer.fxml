@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import de.jensd.fx.glyphs.fontawesome.*?>
-<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.effect.GaussianBlur?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
-<?import java.lang.String?>
+<?import de.jensd.fx.glyphs.fontawesome.*?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <StackPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" onMouseDragged="#onMouseDragged"
-           onMouseMoved="#onMouseMoved"
-           onMousePressed="#onMousePressed" xmlns="http://javafx.com/javafx/8.0.66">
+           onMouseMoved="#onMouseMoved" onMousePressed="#onMousePressed" xmlns="http://javafx.com/javafx/8.0.66">
     <children>
         <BorderPane>
             <center>
-                <ImageView fx:id="coverView" cache="true" cacheHint="SCALE" pickOnBounds="true" preserveRatio="true"/>
+                <ImageView fx:id="coverView" cache="true" cacheHint="SCALE" pickOnBounds="true"/>
             </center>
             <effect>
                 <GaussianBlur/>

@@ -25,7 +25,7 @@ import javafx.stage.Stage;
 
 import org.olympe.musicplayer.bean.model.Audio;
 
-public class DefaultFXMLController extends MusicPlayerFXMLController
+public class DefaultFXMLController extends CoverImageFXMLController
 {
     private static final String FXML_NAME = "fxml/MusicPlayer.fxml";
     private static final String CSS_NAME = "css/default.css";

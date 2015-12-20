@@ -67,7 +67,7 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
         {
             stop();
             step(+1);
-            MediaPlayer mediaPlayer = getLoadedMediaPlayer();
+            MediaPlayer mediaPlayer = getLoadedAudio();
             if (isPlaySelected())
                 mediaPlayer.play();
         }
@@ -132,26 +132,29 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
     }
 
     @Override
-    protected void updateMediaPlayer(ObservableValue<? extends MediaPlayer> observable, MediaPlayer oldValue, MediaPlayer newValue)
+    protected void updateAudio(ObservableValue<? extends Audio> observable, Audio oldValue, Audio newValue)
     {
-        logger.entering("MusicPlayerFXMLController", "updateMediaPlayer", new Object[]{observable, oldValue, newValue});
+        logger.entering("MusicPlayerFXMLController", "updateAudio", new Object[]{observable, oldValue, newValue});
+
         if (oldValue != null)
         {
-            oldValue.currentTimeProperty().removeListener(currentTimeChangeListener);
-            oldValue.totalDurationProperty().removeListener(totalTimeChangeListener);
+            MediaPlayer player = oldValue.getMediaPlayer();
+            player.currentTimeProperty().removeListener(currentTimeChangeListener);
+            player.totalDurationProperty().removeListener(totalTimeChangeListener);
         }
         currentProgressProperty().set(0.0);
         currentDurationProperty().set(0);
         if (newValue != null)
         {
-            newValue.currentTimeProperty().addListener(currentTimeChangeListener);
-            newValue.cycleDurationProperty().addListener(totalTimeChangeListener);
-            if (newValue.getTotalDuration() != null)
+            MediaPlayer player = newValue.getMediaPlayer();
+            player.currentTimeProperty().addListener(currentTimeChangeListener);
+            player.cycleDurationProperty().addListener(totalTimeChangeListener);
+            if (player.getTotalDuration() != null)
             {
-                totalDurationProperty().set((long) newValue.getTotalDuration().toMillis());
+                totalDurationProperty().set((long) player.getTotalDuration().toMillis());
             }
         }
-        logger.exiting("MusicPlayerFXMLController", "updateMediaPlayer");
+        logger.exiting("MusicPlayerFXMLController", "updateAudio");
     }
 
     @Override
