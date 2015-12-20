@@ -43,15 +43,9 @@ public abstract class DataFXMLController<T> extends InternalNotifierFXMLControll
         return data;
     }
 
-    protected void fireDataRemoved(List<? extends T> datas)
-    {
-        // Override if needed.
-    }
+    protected abstract void fireDataRemoved(List<? extends T> datas);
 
-    protected void fireDataAdded(List<? extends T> datas)
-    {
-        // Override if needed.
-    }
+    protected abstract void fireDataAdded(List<? extends T> datas);
 
     protected abstract SelectionModel<T> getSelectionModel();
 
@@ -64,6 +58,7 @@ public abstract class DataFXMLController<T> extends InternalNotifierFXMLControll
     @Override
     void initialize()
     {
+        logger.entering("DataFXMLController", "initialize");
         super.initialize();
         data.addListener(this::onDataListChanged);
         SelectionModel selection = getSelectionModel();
@@ -76,11 +71,13 @@ public abstract class DataFXMLController<T> extends InternalNotifierFXMLControll
         removeDataButton.disableProperty().bind(isSelectionEmpty);
         removeDataButton.visibleProperty().bind(Bindings.not(isSelectionEmpty));
         removeDataButton.managedProperty().bind(Bindings.not(isSelectionEmpty));
+        logger.exiting("DataFXMLController", "initialize");
     }
 
     @Override
     void onAction(ActionEvent event)
     {
+        logger.entering("DataFXMLController", "onAction", event);
         super.onAction(event);
         if (event.isConsumed())
             return;
@@ -116,10 +113,12 @@ public abstract class DataFXMLController<T> extends InternalNotifierFXMLControll
             model.clearSelection();
             event.consume();
         }
+        logger.exiting("DataFXMLController", "onAction");
     }
 
     private void onDataListChanged(ListChangeListener.Change<? extends T> c)
     {
+        logger.entering("DataFXMLController", "onDataListChanged", c);
         while (c.next())
         {
             if (c.wasRemoved())
@@ -131,10 +130,12 @@ public abstract class DataFXMLController<T> extends InternalNotifierFXMLControll
                 fireDataAdded(c.getAddedSubList());
             }
         }
+        logger.exiting("DataFXMLController", "onDataListChanged");
     }
 
     private FileChooser createFileChooser()
     {
+        logger.entering("DataFXMLController", "createFileChooser");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         fileChooser.setTitle(localize("FileChooser.title"));
@@ -142,6 +143,7 @@ public abstract class DataFXMLController<T> extends InternalNotifierFXMLControll
         registerExtensionFilters(extFilters);
         ExtensionFilter selected = getSelectedExtensionFilter(extFilters);
         fileChooser.setSelectedExtensionFilter(selected);
+        logger.entering("DataFXMLController", "createFileChooser", fileChooser);
         return fileChooser;
     }
 }

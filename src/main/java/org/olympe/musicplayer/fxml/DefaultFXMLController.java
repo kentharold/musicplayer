@@ -1,6 +1,15 @@
 package org.olympe.musicplayer.fxml;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
+
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.InputMethodEvent;
@@ -11,13 +20,42 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.input.SwipeEvent;
 import javafx.scene.input.TouchEvent;
 import javafx.scene.input.ZoomEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+
+import org.olympe.musicplayer.bean.model.Audio;
 
 public class DefaultFXMLController extends MusicPlayerFXMLController
 {
-    public DefaultFXMLController(Application application, Stage stage)
+    private static final String FXML_NAME = "fxml/MusicPlayer.fxml";
+    private static final String CSS_NAME = "css/default.css";
+    private static final String I18N_NAME = "i18n.Messages";
+
+    public DefaultFXMLController(Application application, Stage stage) throws IOException
     {
         super(application, stage);
+        URL location = ClassLoader.getSystemResource(FXML_NAME);
+        FXMLLoader loader = new FXMLLoader(location);
+        ResourceBundle resources = ResourceBundle.getBundle(I18N_NAME);
+        loader.setResources(resources);
+        loader.setController(this);
+        Parent busyNode = new BorderPane(new Label("loading the application"));
+        Scene scene = new Scene(busyNode, 600, 480);
+        URL css = ClassLoader.getSystemResource(CSS_NAME);
+        scene.getStylesheets().add(css.toExternalForm());
+        stage.setScene(scene);
+        stage.setTitle("Olympe Music Player");
+        Platform.runLater(() -> initialize(scene, loader));
+    }
+
+    @Override
+    protected void unregisterAudio(Audio audio)
+    {
+    }
+
+    @Override
+    protected void registerAudio(Audio audio)
+    {
     }
 
     @Override
@@ -63,8 +101,10 @@ public class DefaultFXMLController extends MusicPlayerFXMLController
     @Override
     void initialize()
     {
+        logger.entering("DefaultFXMLController", "initialize");
         super.initialize();
         collectOptions();
+        logger.exiting("DefaultFXMLController", "initialize");
     }
 
     @Override
@@ -230,5 +270,21 @@ public class DefaultFXMLController extends MusicPlayerFXMLController
     @Override
     void onZoomFinished(ZoomEvent event)
     {
+    }
+
+    private void initialize(Scene scene, FXMLLoader loader)
+    {
+        logger.entering("DefaultFXMLController", "initialize", new Object[]{scene, loader});
+        try
+        {
+            Parent root = loader.load();
+            scene.setRoot(root);
+        }
+        catch (IOException e)
+        {
+            logger.severe(e.getLocalizedMessage());
+            exit(1);
+        }
+        logger.exiting("DefaultFXMLController", "initialize");
     }
 }

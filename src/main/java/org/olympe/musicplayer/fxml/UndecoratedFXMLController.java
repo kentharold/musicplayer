@@ -1,6 +1,6 @@
 package org.olympe.musicplayer.fxml;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,6 +20,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.property.BeanPropertyUtils;
@@ -28,11 +29,12 @@ import org.olympe.musicplayer.bean.configurator.WindowConfigurator;
 import org.olympe.musicplayer.util.BeanPropertyWrapper;
 
 /**
- * This controller abstraction allows the end user to toggle the window to full screen, minimize, maximize, resize, move
- * or close it.
+ * <p> This controller abstraction allows the end user to toggle the window to full screen, minimize, maximize, resize,
+ * move or close it. </p>
  */
 public abstract class UndecoratedFXMLController extends ConfigurableFXMLController
 {
+    private static List<Cursor> RESIZE_CURSORS;
     @FXML
     private Button fullscreenButton;
     @FXML
@@ -54,6 +56,28 @@ public abstract class UndecoratedFXMLController extends ConfigurableFXMLControll
     public UndecoratedFXMLController(Application application, Stage stage)
     {
         super(application, stage);
+        stage.initStyle(StageStyle.UNDECORATED);
+        stage.setResizable(true);
+    }
+
+    private static boolean isResizeCursor(Cursor cursor)
+    {
+        logger.entering("UndecoratedFXMLController", "isResizeCursor", cursor);
+        if (RESIZE_CURSORS == null)
+        {
+            RESIZE_CURSORS = new ArrayList<>();
+            RESIZE_CURSORS.add(Cursor.N_RESIZE);
+            RESIZE_CURSORS.add(Cursor.NE_RESIZE);
+            RESIZE_CURSORS.add(Cursor.NW_RESIZE);
+            RESIZE_CURSORS.add(Cursor.S_RESIZE);
+            RESIZE_CURSORS.add(Cursor.SE_RESIZE);
+            RESIZE_CURSORS.add(Cursor.SW_RESIZE);
+            RESIZE_CURSORS.add(Cursor.E_RESIZE);
+            RESIZE_CURSORS.add(Cursor.W_RESIZE);
+        }
+        boolean result = RESIZE_CURSORS.contains(cursor);
+        logger.exiting("UndecoratedFXMLController", "isResizeCursor", result);
+        return result;
     }
 
     public final boolean isMaximized()
@@ -63,6 +87,7 @@ public abstract class UndecoratedFXMLController extends ConfigurableFXMLControll
 
     public final void setMaximized(boolean maximized)
     {
+        logger.entering("UndecoratedFXMLController", "setMaximized", maximized);
         Stage stage = getStage();
         if (!Platform.isFxApplicationThread())
         {
@@ -80,22 +105,30 @@ public abstract class UndecoratedFXMLController extends ConfigurableFXMLControll
         }
         else
         {
-            Rectangle2D rect = new Rectangle2D(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
-            ObservableList<Screen> screensForRectangle = Screen.getScreensForRectangle(rect);
+            double x = stage.getX();
+            double y = stage.getY();
+            double width = stage.getWidth();
+            double height = stage.getHeight();
+            Rectangle2D rect = new Rectangle2D(x, y, width, height);
+            ObservableList<Screen> screensForRectangle = null;
+            screensForRectangle = Screen.getScreensForRectangle(rect);
             Screen screen = screensForRectangle.get(0);
             Rectangle2D visualBounds = screen.getVisualBounds();
-            savedBounds = new BoundingBox(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
+            savedBounds = new BoundingBox(x, y, width, height);
             stage.setX(visualBounds.getMinX());
             stage.setY(visualBounds.getMinY());
             stage.setWidth(visualBounds.getWidth());
             stage.setHeight(visualBounds.getHeight());
             this.maximized = true;
         }
+        logger.exiting("UndecoratedFXMLController", "setMaximized");
     }
 
     public final void toggleMaximized()
     {
+        logger.entering("UndecoratedFXMLController", "toggleMaximized");
         setMaximized(!isMaximized());
+        logger.exiting("UndecoratedFXMLController", "toggleMaximized");
     }
 
     public final boolean isMinimized()
@@ -117,9 +150,6 @@ public abstract class UndecoratedFXMLController extends ConfigurableFXMLControll
     {
         setMinimized(!isMinimized());
     }
-    //
-    // Maximized state of the window.
-    //
 
     public final boolean isFullScreen()
     {
@@ -138,223 +168,231 @@ public abstract class UndecoratedFXMLController extends ConfigurableFXMLControll
 
     public final void toggleFullScreen()
     {
+        logger.entering("UndecoratedFXMLController", "toggleFullScreen");
         setFullScreen(!isFullScreen());
+        logger.exiting("UndecoratedFXMLController", "toggleFullScreen");
     }
-    //
-    // Minimized state of the window.
-    //
 
     public final void exit(int status)
     {
+        logger.entering("UndecoratedFXMLController", "exit", status);
         getStage().close();
         Platform.exit();
         System.exit(status);
+        logger.exiting("UndecoratedFXMLController", "exit");
     }
 
     @Override
     protected void collectOptions(ObservableList<Item> options)
     {
+        logger.entering("UndecoratedFXMLController", "collectOptions", options);
         Stream<Item> stream = BeanPropertyUtils.getProperties(configurator).stream();
         stream = stream.map(BeanPropertyWrapper::new);
         options.addAll(stream.collect(Collectors.toList()));
+        logger.exiting("UndecoratedFXMLController", "collectOptions");
     }
 
     @Override
     void onAction(ActionEvent event)
     {
+        logger.entering("UndecoratedFXMLController", "onAction", event);
         super.onAction(event);
-        if (event.isConsumed())
-            return;
-        Object source = event.getSource();
-        if (source == fullscreenButton)
+        if (!event.isConsumed())
         {
-            toggleFullScreen();
-            event.consume();
+            Object source = event.getSource();
+            boolean consume = true;
+            if (source == fullscreenButton)
+                toggleFullScreen();
+            else if (source == minimizeButton)
+                toggleMinimized();
+            else if (source == maximizeButton)
+                toggleMaximized();
+            else if (source == closeButton)
+                exit(0);
+            else
+                consume = false;
+            if (consume)
+                event.consume(); // should never reach hier.
         }
-        else if (source == minimizeButton)
-        {
-            toggleMinimized();
-            event.consume();
-        }
-        else if (source == maximizeButton)
-        {
-            toggleMaximized();
-            event.consume();
-        }
-        else if (source == closeButton)
-        {
-            exit(0);
-            event.consume(); // should never reach hier.
-        }
+        logger.exiting("UndecoratedFXMLController", "onAction");
     }
-    //
-    // Full screen state of the window.
-    //
 
     @Override
     void onMousePressed(MouseEvent event)
     {
-        if (event.isConsumed())
-            return;
-        Object source = event.getSource();
-        if (source == root)
+        logger.entering("UndecoratedFXMLController", "onMousePressed", event);
+        if (!event.isConsumed())
         {
-            Cursor cursor = root.getCursor();
-            if (!isResizeCursor(cursor))
-                return;
+            Object source = event.getSource();
+            boolean isTitleBar = source == titlebarHbox;
+            boolean isRoot = source == root && isResizeCursor(root.getCursor());
+            boolean isValidSource = isRoot || isTitleBar;
+            if (isValidSource && event.isPrimaryButtonDown())
+            {
+                mouseDragOffsetX = event.getScreenX();
+                mouseDragOffsetY = event.getScreenY();
+                event.consume();
+            }
+            else
+            {
+                mouseDragOffsetX = -1;
+                mouseDragOffsetY = -1;
+            }
         }
-        if ((source == titlebarHbox || source == root) && event.isPrimaryButtonDown())
-        {
-            mouseDragOffsetX = event.getScreenX();
-            mouseDragOffsetY = event.getScreenY();
-            event.consume();
-        }
-        else
-        {
-            mouseDragOffsetX = -1;
-            mouseDragOffsetY = -1;
-        }
+        logger.exiting("UndecoratedFXMLController", "onMousePressed");
     }
 
     @Override
     void onMouseDragged(MouseEvent event)
     {
-        if (event.isConsumed())
-            return;
-        Stage stage = getStage();
-        Object source = event.getSource();
-        if (source == titlebarHbox && !isResizeCursor(root.getCursor()) && event.isPrimaryButtonDown() && mouseDragOffsetX != -1 && mouseDragOffsetY != -1 && !isFullScreen())
+        logger.entering("UndecoratedFXMLController", "onMouseDragged", event);
+        if (!event.isConsumed())
         {
-            if (isMaximized())
+            Stage stage = getStage();
+            Object source = event.getSource();
+            boolean isTitleBar = source == titlebarHbox && !isResizeCursor(root.getCursor());
+            boolean isValidOffset = mouseDragOffsetX != -1 && mouseDragOffsetY != -1;
+            boolean canProcessMouseDrag = isValidOffset && !isFullScreen();
+            canProcessMouseDrag = canProcessMouseDrag && event.isPrimaryButtonDown();
+            if (isTitleBar && canProcessMouseDrag)
             {
-                setMaximized(false);
-                stage.setX(event.getScreenX() - stage.getWidth() / 2);
-                stage.setY(event.getScreenY());
-            }
-            double newX = event.getScreenX();
-            double newY = event.getScreenY();
-            double x = stage.getX() + newX - mouseDragOffsetX;
-            double y = stage.getY() + newY - mouseDragOffsetY;
-            mouseDragOffsetX = newX;
-            mouseDragOffsetY = newY;
-            stage.setX(x);
-            stage.setY(y);
-            event.consume();
-        }
-        else if (source == root && event.isPrimaryButtonDown() && mouseDragOffsetX != -1 && mouseDragOffsetY != -1 && !isFullScreen() && !isMaximized())
-        {
-            Cursor cursor = root.getCursor();
-            if (cursor == Cursor.DEFAULT || event.isStillSincePress())
-                return;
-            boolean north = false;
-            boolean south = false;
-            boolean east = false;
-            boolean west = false;
-            if (cursor == Cursor.N_RESIZE || cursor == Cursor.NE_RESIZE || cursor == Cursor.NW_RESIZE)
-                north = true;
-            if (cursor == Cursor.S_RESIZE || cursor == Cursor.SE_RESIZE || cursor == Cursor.SW_RESIZE)
-                south = true;
-            if (cursor == Cursor.E_RESIZE || cursor == Cursor.NE_RESIZE || cursor == Cursor.SE_RESIZE)
-                east = true;
-            if (cursor == Cursor.W_RESIZE || cursor == Cursor.NW_RESIZE || cursor == Cursor.SW_RESIZE)
-                west = true;
-            double width = stage.getWidth() + (west ? -1 : +1) * (event.getScreenX() - mouseDragOffsetX);
-            double height = stage.getHeight() + (north ? -1 : +1) * (event.getScreenY() - mouseDragOffsetY);
-            double x = stage.getX() + event.getScreenX() - mouseDragOffsetX;
-            double y = stage.getY() + event.getScreenY() - mouseDragOffsetY;
-            if ((north || south) && height >= stage.getMinHeight())
-                stage.setHeight(height);
-            if ((east || west) && width >= stage.getMinWidth())
-                stage.setWidth(width);
-            if (west && x >= 0)
-                stage.setX(x);
-            if (north && y >= 0)
-            {
-                Rectangle2D rect = new Rectangle2D(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
-                ObservableList<Screen> screensForRectangle = Screen.getScreensForRectangle(rect);
-                if (screensForRectangle.size() > 0)
+                if (isMaximized())
                 {
-                    Screen screen = screensForRectangle.get(0);
-                    Rectangle2D visualBounds = screen.getVisualBounds();
-                    if (y < visualBounds.getHeight() - 30 && y >= visualBounds.getMinY())
+                    setMaximized(false);
+                    stage.setX(event.getScreenX() - stage.getWidth() / 2);
+                    stage.setY(event.getScreenY());
+                }
+                double newX = event.getScreenX();
+                double newY = event.getScreenY();
+                double x = stage.getX() + newX - mouseDragOffsetX;
+                double y = stage.getY() + newY - mouseDragOffsetY;
+                mouseDragOffsetX = newX;
+                mouseDragOffsetY = newY;
+                stage.setX(x);
+                stage.setY(y);
+                event.consume();
+            }
+            else if (source == root && canProcessMouseDrag && !isMaximized())
+            {
+                Cursor cursor = root.getCursor();
+                if (cursor == Cursor.DEFAULT || event.isStillSincePress())
+                    return;
+                boolean north = false;
+                boolean south = false;
+                boolean east = false;
+                boolean west = false;
+                if (cursor == Cursor.N_RESIZE || cursor == Cursor.NE_RESIZE || cursor == Cursor.NW_RESIZE)
+                    north = true;
+                if (cursor == Cursor.S_RESIZE || cursor == Cursor.SE_RESIZE || cursor == Cursor.SW_RESIZE)
+                    south = true;
+                if (cursor == Cursor.E_RESIZE || cursor == Cursor.NE_RESIZE || cursor == Cursor.SE_RESIZE)
+                    east = true;
+                if (cursor == Cursor.W_RESIZE || cursor == Cursor.NW_RESIZE || cursor == Cursor.SW_RESIZE)
+                    west = true;
+                double x = stage.getX();
+                double y = stage.getY();
+                double width = stage.getWidth();
+                double height = stage.getHeight();
+                double newWidth = width + (west ? -1 : +1) * (event.getScreenX() - mouseDragOffsetX);
+                double newHeight = height + (north ? -1 : +1) * (event.getScreenY() - mouseDragOffsetY);
+                double newX = x + event.getScreenX() - mouseDragOffsetX;
+                double newY = y + event.getScreenY() - mouseDragOffsetY;
+                if ((north || south) && newHeight >= stage.getMinHeight())
+                    stage.setHeight(newHeight);
+                if ((east || west) && newWidth >= stage.getMinWidth())
+                    stage.setWidth(newWidth);
+                if (west && newX >= 0)
+                    stage.setX(newX);
+                if (north && newY >= 0)
+                {
+                    Rectangle2D rect = new Rectangle2D(x, y, width, height);
+                    ObservableList<Screen> screensForRectangle = null;
+                    screensForRectangle = Screen.getScreensForRectangle(rect);
+                    if (screensForRectangle.size() > 0)
                     {
-                        stage.setY(y);
+                        Screen screen = screensForRectangle.get(0);
+                        Rectangle2D visualBounds = screen.getVisualBounds();
+                        boolean canSetY = newY < visualBounds.getHeight() - 30;
+                        canSetY = canSetY && newY >= visualBounds.getMinY();
+                        if (canSetY)
+                            stage.setY(newY);
                     }
                 }
+                mouseDragOffsetX = event.getScreenX();
+                mouseDragOffsetY = event.getScreenY();
+                event.consume();
             }
-            mouseDragOffsetX = event.getScreenX();
-            mouseDragOffsetY = event.getScreenY();
-            event.consume();
         }
+        logger.exiting("UndecoratedFXMLController", "onMouseDragged");
     }
 
     @Override
     void onMouseClicked(MouseEvent event)
     {
-        if (event.isConsumed())
-            return;
-        Object source = event.getSource();
-        Stage stage = getStage();
-        if (source == titlebarHbox && !isResizeCursor(root.getCursor()) && !stage.isFullScreen())
+        logger.entering("UndecoratedFXMLController", "onMouseClicked", event);
+        if (!event.isConsumed())
         {
-            if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2)
+            Object source = event.getSource();
+            Stage stage = getStage();
+            boolean isValidSource = source == titlebarHbox;
+            isValidSource = isValidSource && !isResizeCursor(root.getCursor());
+            boolean isDoubleClick = event.getButton() == MouseButton.PRIMARY;
+            isDoubleClick = isDoubleClick && event.getClickCount() == 2;
+            if (isValidSource && isDoubleClick && !stage.isFullScreen())
             {
                 toggleMaximized();
                 event.consume();
             }
         }
+        logger.exiting("UndecoratedFXMLController", "onMouseClicked");
     }
-    //
-    // Quit the application.
-    //
 
     @Override
     void onMouseMoved(MouseEvent event)
     {
-        if (event.isConsumed())
-            return;
-        Object source = event.getSource();
-        if (source == root && !isMaximized() && !isFullScreen())
+        logger.entering("UndecoratedFXMLController", "onMouseMoved", event);
+        if (!event.isConsumed())
         {
-            // change the cursor for resize.
-            root.setCursor(Cursor.DEFAULT);
-            double width = getStage().getWidth();
-            double height = getStage().getHeight();
-            double x = event.getSceneX() - width;
-            double y = event.getSceneY() - height;
-            boolean north = y <= -height + 3 && y >= -height;
-            boolean east = x <= 0 && x >= -3;
-            boolean south = y <= 0 && y >= -3;
-            boolean west = x <= -width + 3 && x >= -width;
-            if (north && east)
-                root.setCursor(Cursor.NE_RESIZE);
-            else if (north && west)
-                root.setCursor(Cursor.NW_RESIZE);
-            else if (south && east)
-                root.setCursor(Cursor.SE_RESIZE);
-            else if (south && west)
-                root.setCursor(Cursor.SW_RESIZE);
-            else if (north)
-                root.setCursor(Cursor.N_RESIZE);
-            else if (south)
-                root.setCursor(Cursor.S_RESIZE);
-            else if (east)
-                root.setCursor(Cursor.E_RESIZE);
-            else if (west)
+            Object source = event.getSource();
+            if (source == root && !isMaximized() && !isFullScreen())
             {
-                root.setCursor(Cursor.W_RESIZE);
+                // change the cursor for resize.
+                root.setCursor(Cursor.DEFAULT);
+                double width = getStage().getWidth();
+                double height = getStage().getHeight();
+                double x = event.getSceneX() - width;
+                double y = event.getSceneY() - height;
+                boolean north = y <= -height + 3 && y >= -height;
+                boolean east = x <= 0 && x >= -3;
+                boolean south = y <= 0 && y >= -3;
+                boolean west = x <= -width + 3 && x >= -width;
+                boolean consume = true;
+                if (north && east)
+                    root.setCursor(Cursor.NE_RESIZE);
+                else if (north && west)
+                    root.setCursor(Cursor.NW_RESIZE);
+                else if (south && east)
+                    root.setCursor(Cursor.SE_RESIZE);
+                else if (south && west)
+                    root.setCursor(Cursor.SW_RESIZE);
+                else if (north)
+                    root.setCursor(Cursor.N_RESIZE);
+                else if (south)
+                    root.setCursor(Cursor.S_RESIZE);
+                else if (east)
+                    root.setCursor(Cursor.E_RESIZE);
+                else if (west)
+                {
+                    root.setCursor(Cursor.W_RESIZE);
+                }
+                else
+                {
+                    consume = false;
+                }
+                if (consume)
+                    event.consume();
             }
-            else
-            {
-                return;
-            }
-            event.consume();
         }
-    }
-
-    private boolean isResizeCursor(Cursor cursor)
-    {
-        List<Cursor> cursors = Arrays.asList(Cursor.N_RESIZE, Cursor.NE_RESIZE, Cursor.NW_RESIZE, Cursor.S_RESIZE, Cursor.SW_RESIZE, Cursor.SE_RESIZE, Cursor.W_RESIZE, Cursor.E_RESIZE);
-        return cursors.contains(cursor);
+        logger.exiting("UndecoratedFXMLController", "onMouseMoved");
     }
 }

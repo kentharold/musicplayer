@@ -49,14 +49,17 @@ public abstract class InternalNotifierFXMLController extends UndecoratedFXMLCont
     @Override
     protected void showOptions(PropertySheet sheet)
     {
+        logger.entering("InternalNotifierFXMLController", "showOptions", sheet);
         String title = localize("Options.name");
         Node graphic = new FontAwesomeIconView(FontAwesomeIcon.COG);
         notify(title, graphic, sheet, ButtonData.CANCEL_CLOSE);
+        logger.exiting("InternalNotifierFXMLController", "showOptions");
     }
 
     @Override
     void onAction(ActionEvent event)
     {
+        logger.entering("InternalNotifierFXMLController", "onAction", event);
         super.onAction(event);
         if (event.isConsumed())
             return;
@@ -72,42 +75,56 @@ public abstract class InternalNotifierFXMLController extends UndecoratedFXMLCont
             Toolkit.getToolkit().exitNestedEventLoop(this, ret);
             event.consume();
         }
+        logger.exiting("InternalNotifierFXMLController", "onAction");
     }
 
     private Object notify(String title, Node graphic, Object content, ButtonData... buttons)
     {
+        logger.entering("InternalNotifierFXMLController", "notify", new Object[]{title, graphic, content, buttons});
         if (!Toolkit.getToolkit().canStartNestedEventLoop())
             throw new IllegalStateException();
-        if (Toolkit.getToolkit().isNestedLoopRunning())
+        Object result = null;
+        if (!Toolkit.getToolkit().isNestedLoopRunning())
+        {
+            setNotifierVisible(true);
+            setNotifierTitle(title);
+            setNotifierGraphic(graphic);
+            setNotifierContent(content);
+            setNotifierButtons(buttons);
+            result = Toolkit.getToolkit().enterNestedEventLoop(this);
+        }
+        else
         {
             logger.warning("the notifier is already running.");
-            return null;
         }
-        setNotifierVisible(true);
-        setNotifierTitle(title);
-        setNotifierGraphic(graphic);
-        setNotifierContent(content);
-        setNotifierButtons(buttons);
-        return Toolkit.getToolkit().enterNestedEventLoop(this);
+        logger.exiting("InternalNotifierFXMLController", "notify", result);
+        return result;
     }
 
     private void setNotifierVisible(boolean visible)
     {
+        logger.entering("InternalNotifierFXMLController", "setNotifierVisible", visible);
         overlayPane.setVisible(visible);
+        logger.exiting("InternalNotifierFXMLController", "setNotifierVisible");
     }
 
     private void setNotifierTitle(String title)
     {
+        logger.entering("InternalNotifierFXMLController", "setNotifierTitle", title);
         notifierHeaderLabel.setText(title);
+        logger.exiting("InternalNotifierFXMLController", "setNotifierTitle");
     }
 
     private void setNotifierGraphic(Node graphic)
     {
+        logger.entering("InternalNotifierFXMLController", "setNotifierGraphic", graphic);
         notifierHeaderLabel.setGraphic(graphic);
+        logger.exiting("InternalNotifierFXMLController", "setNotifierGraphic");
     }
 
     private void setNotifierContent(Object content)
     {
+        logger.entering("InternalNotifierFXMLController", "setNotifierContent", content);
         Node node = null;
         if (content instanceof String)
         {
@@ -118,18 +135,22 @@ public abstract class InternalNotifierFXMLController extends UndecoratedFXMLCont
         else if (content instanceof Node)
             node = (Node) content;
         notifierContainer.setCenter(node);
+        logger.exiting("InternalNotifierFXMLController", "setNotifierContent");
     }
 
     private void setNotifierButtons(ButtonData... notifierButtons)
     {
+        logger.entering("InternalNotifierFXMLController", "setNotifierButtons", notifierButtons);
         List<Button> buttons = new ArrayList<>();
         Stream<ButtonData> stream = Stream.of(notifierButtons);
         stream.forEach(buttonData -> buttons.add(getOrCreateButton(buttonData)));
         notifierButtonBar.getButtons().setAll(buttons);
+        logger.exiting("InternalNotifierFXMLController", "setNotifierButtons");
     }
 
     private Button getOrCreateButton(ButtonData buttonData)
     {
+        logger.entering("InternalNotifierFXMLController", "getOrCreateButton", buttonData);
         Button button = null;
         switch (buttonData)
         {
@@ -140,30 +161,34 @@ public abstract class InternalNotifierFXMLController extends UndecoratedFXMLCont
                 button = getOrCreateCloseButton();
                 break;
         }
-        if (button == null)
-            throw new IllegalStateException();
+        assert button != null;
+        logger.exiting("InternalNotifierFXMLController", "getOrCreateButton", button);
         return button;
     }
 
     private Button getOrCreateOkButton()
     {
+        logger.entering("InternalNotifierFXMLController", "getOrCreateOkButton");
         if (okButton == null)
         {
             okButton = new Button(localize("OkButton.name"));
             ButtonBar.setButtonData(okButton, ButtonData.OK_DONE);
             okButton.setOnAction(this::onAction);
         }
+        logger.exiting("InternalNotifierFXMLController", "getOrCreateOkButton", okButton);
         return okButton;
     }
 
     private Button getOrCreateCloseButton()
     {
+        logger.entering("InternalNotifierFXMLController", "getOrCreateCloseButton");
         if (closeButton == null)
         {
             closeButton = new Button(localize("CloseButton.name"));
             ButtonBar.setButtonData(closeButton, ButtonData.CANCEL_CLOSE);
             closeButton.setOnAction(this::onAction);
         }
+        logger.exiting("InternalNotifierFXMLController", "getOrCreateCloseButton", closeButton);
         return closeButton;
     }
 }

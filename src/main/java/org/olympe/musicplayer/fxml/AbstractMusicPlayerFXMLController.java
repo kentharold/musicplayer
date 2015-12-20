@@ -48,39 +48,50 @@ public abstract class AbstractMusicPlayerFXMLController extends AudioListFXMLCon
 
     public final void stepForward()
     {
+        logger.entering("AbstractMusicPlayerFXMLController", "stepForward");
         stop();
         step(+1);
         setPlay(isPlaySelected());
+        logger.exiting("AbstractMusicPlayerFXMLController", "stepForward");
     }
 
     public final void stepBackward()
     {
+        logger.entering("AbstractMusicPlayerFXMLController", "stepBackward");
         stop();
         step(-1);
         setPlay(isPlaySelected());
+        logger.entering("AbstractMusicPlayerFXMLController", "stepBackward");
     }
 
     public final void stop()
     {
+        logger.entering("AbstractMusicPlayerFXMLController", "stop");
         MediaPlayer mediaPlayer = getLoadedMediaPlayer();
         if (mediaPlayer != null)
             mediaPlayer.stop();
+        logger.exiting("AbstractMusicPlayerFXMLController", "stop");
     }
 
     public final boolean isPlaying()
     {
+        logger.entering("AbstractMusicPlayerFXMLController", "isPlaying");
         MediaPlayer mediaPlayer = getLoadedMediaPlayer();
         MediaPlayer.Status status = null;
         if (mediaPlayer != null)
             status = mediaPlayer.getStatus();
-        return status != null && status == PLAYING;
+        boolean result = status != null && status == PLAYING;
+        logger.exiting("AbstractMusicPlayerFXMLController", "isPlaying", result);
+        return result;
     }
 
     public final void toggleRepeat()
     {
+        logger.entering("AbstractMusicPlayerFXMLController", "toggleRepeat");
         Collection<MediaPlayer> col = getMediaPlayerCache().values();
         Stream<MediaPlayer> stream = col.stream();
         stream.forEach(this::updateCycleCount);
+        logger.exiting("AbstractMusicPlayerFXMLController", "toggleRepeat");
     }
 
     public final void toggleMute()
@@ -92,35 +103,43 @@ public abstract class AbstractMusicPlayerFXMLController extends AudioListFXMLCon
 
     public final void togglePlay()
     {
+        logger.entering("AbstractMusicPlayerFXMLController", "togglePlay");
         setPlay(!isPlaying());
+        logger.exiting("AbstractMusicPlayerFXMLController", "togglePlay");
     }
 
     public final void setPlay(boolean play)
     {
+        logger.entering("AbstractMusicPlayerFXMLController", "setPlay", play);
         MediaPlayer mediaPlayer = getLoadedMediaPlayer();
         if (play)
             mediaPlayer.play();
         else
             mediaPlayer.pause();
         setPlaySelected(play);
+        logger.exiting("AbstractMusicPlayerFXMLController", "setPlay");
     }
 
     public final void step(int offset)
     {
+        logger.entering("AbstractMusicPlayerFXMLController", "step", offset);
         int index = compute(offset);
         loadedIndex.set(index);
         Audio audio = getData().get(index);
         loadedMediaPlayer.set(audio.getMediaPlayer());
+        logger.exiting("AbstractMusicPlayerFXMLController", "step");
     }
 
-    public final boolean step(Audio audio)
+    public final void step(Audio audio)
     {
-        if (audio == null)
-            return false;
-        loadedMediaPlayer.set(audio.getMediaPlayer());
-        int index = getData().indexOf(audio);
-        loadedIndex.set(index);
-        return true;
+        logger.entering("AbstractMusicPlayerFXMLController", "step", audio);
+        if (audio != null)
+        {
+            loadedMediaPlayer.set(audio.getMediaPlayer());
+            int index = getData().indexOf(audio);
+            loadedIndex.set(index);
+        }
+        logger.exiting("AbstractMusicPlayerFXMLController", "step");
     }
 
     public final int getLoadedIndex()
@@ -155,18 +174,20 @@ public abstract class AbstractMusicPlayerFXMLController extends AudioListFXMLCon
 
     public final void seek(double value)
     {
+        logger.entering("AbstractMusicPlayerFXMLController", "seek", value);
         MediaPlayer player = getLoadedMediaPlayer();
         if (player != null)
         {
             // can only seek when the player is ready.
             runLater(() -> _seek(player, value));
         }
+        logger.exiting("AbstractMusicPlayerFXMLController", "seek");
     }
 
     @Override
     protected void registerMediaPlayer(File file, MediaPlayer mediaPlayer)
     {
-        super.registerMediaPlayer(file, mediaPlayer);
+        logger.entering("AbstractMusicPlayerFXMLController", "registerMediaPlayer", new Object[]{file, mediaPlayer});
         updateCycleCount(mediaPlayer);
         mediaPlayer.muteProperty().bind(muteProperty());
         mediaPlayer.volumeProperty().bind(volumeProperty());
@@ -179,12 +200,13 @@ public abstract class AbstractMusicPlayerFXMLController extends AudioListFXMLCon
         mediaPlayer.setOnRepeat(this::onRepeat);
         mediaPlayer.setOnStalled(this::onStalled);
         mediaPlayer.setOnStopped(this::onStopped);
+        logger.exiting("AbstractMusicPlayerFXMLController", "registerMediaPlayer");
     }
 
     @Override
     protected void unregisterMediaPlayer(File file, MediaPlayer mediaPlayer)
     {
-        super.unregisterMediaPlayer(file, mediaPlayer);
+        logger.entering("AbstractMusicPlayerFXMLController", "unregisterMediaPlayer", new Object[]{file, mediaPlayer});
         updateCycleCount(mediaPlayer); // not very useful.
         mediaPlayer.muteProperty().unbind();
         mediaPlayer.volumeProperty().unbind();
@@ -198,6 +220,7 @@ public abstract class AbstractMusicPlayerFXMLController extends AudioListFXMLCon
         mediaPlayer.setOnStalled(null);
         mediaPlayer.setOnStopped(null);
         mediaPlayer.dispose();
+        logger.exiting("AbstractMusicPlayerFXMLController", "registerMediaPlayer");
     }
 
     protected abstract void updateMediaPlayer(ObservableValue<? extends MediaPlayer> observable, MediaPlayer mediaPlayer, MediaPlayer newValue);
@@ -234,14 +257,18 @@ public abstract class AbstractMusicPlayerFXMLController extends AudioListFXMLCon
 
     private void _seek(MediaPlayer player, double value)
     {
+        logger.entering("AbstractMusicPlayerFXMLController", "_seek", new Object[]{player, value});
         player.seek(Duration.millis((value / 100) * totalDuration.get()));
         if (player.getStatus() != MediaPlayer.Status.PLAYING)
             currentDuration.set((long) ((value / 100) * totalDuration.get()));
+        logger.exiting("AbstractMusicPlayerFXMLController", "_seek");
     }
 
     private void updateCycleCount(MediaPlayer mediaPlayer)
     {
+        logger.entering("AbstractMusicPlayerFXMLController", "updateCycleCount", mediaPlayer);
         int repeat = computeRepeat();
         mediaPlayer.setCycleCount(repeat == 1 ? Integer.MAX_VALUE : 1);
+        logger.exiting("AbstractMusicPlayerFXMLController", "updateCycleCount");
     }
 }

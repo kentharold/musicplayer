@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -41,52 +42,35 @@ public abstract class ListViewFXMLController<T> extends DataFXMLController<T>
     @Override
     protected final SelectionModel<T> getSelectionModel()
     {
-        return dataView.getSelectionModel();
+        logger.entering("ListViewFXMLController", "getSelectionModel");
+        SelectionModel<T> result = dataView.getSelectionModel();
+        logger.exiting("ListViewFXMLController", "getSelectionModel", result);
+        return result;
     }
 
-    protected SelectionMode getSelectionMode()
-    {
-        return SelectionMode.MULTIPLE;
-    }
-
-    protected Orientation getOrientation()
-    {
-        return Orientation.VERTICAL;
-    }
-
-    protected double getFixedCellSize()
-    {
-        return Region.USE_COMPUTED_SIZE;
-    }
-
-    protected boolean isEditable()
-    {
-        return false;
-    }
-
-    protected Node createPlaceholder()
-    {
-        return null;
-    }
+    protected abstract Node createPlaceholder();
 
     protected abstract Callback<ListView<T>, ListCell<T>> createCellFactoryFor(ListView<T> listView);
 
     @Override
     void initialize()
     {
+        logger.entering("ListViewFXMLController", "initialize");
         super.initialize();
         dataView.setPlaceholder(createPlaceholder());
         dataView.setCellFactory(createCellFactoryFor(dataView));
-        dataView.setEditable(isEditable());
+        dataView.setEditable(false);
         dataView.setItems(getData());
-        dataView.setFixedCellSize(getFixedCellSize());
-        dataView.setOrientation(getOrientation());
-        dataView.getSelectionModel().setSelectionMode(getSelectionMode());
+        dataView.setFixedCellSize(Region.USE_COMPUTED_SIZE);
+        dataView.setOrientation(Orientation.VERTICAL);
+        dataView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        logger.entering("ListViewFXMLController", "initialize");
     }
 
     @Override
     void onDragOver(DragEvent event)
     {
+        logger.entering("ListViewFXMLController", "onDragOver", event);
         if (event.isConsumed())
             return;
         Object source = event.getSource();
@@ -97,11 +81,13 @@ public abstract class ListViewFXMLController<T> extends DataFXMLController<T>
                 event.acceptTransferModes(TransferMode.COPY);
             event.consume();
         }
+        logger.exiting("ListViewFXMLController", "onDragOver");
     }
 
     @Override
     void onDragDropped(DragEvent event)
     {
+        logger.entering("ListViewFXMLController", "onDragDropped", event);
         if (event.isConsumed())
             return;
         Object source = event.getSource();
@@ -121,11 +107,13 @@ public abstract class ListViewFXMLController<T> extends DataFXMLController<T>
             event.setDropCompleted(success);
             event.consume();
         }
+        logger.exiting("ListViewFXMLController", "onDragDropped");
     }
 
     @Override
     void onMouseClicked(MouseEvent event)
     {
+        logger.entering("ListViewFXMLController", "onMouseClicked", event);
         super.onMouseClicked(event);
         if (event.isConsumed())
             return;
@@ -139,28 +127,40 @@ public abstract class ListViewFXMLController<T> extends DataFXMLController<T>
                 runLater(() -> onAction(new ActionEvent(listCell, listCell)));
             }
         }
+        logger.exiting("ListViewFXMLController", "onMouseClicked");
     }
 
     private List<File> filterSupportedFiles(List<File> files)
     {
+        logger.entering("ListViewFXMLController", "filterSupportedFiles", files);
         List<ExtensionFilter> extFilters = new ArrayList<>();
         registerExtensionFilters(extFilters);
         ExtensionFilter extFilter = getSelectedExtensionFilter(extFilters);
-        return files.stream().filter(file -> match(file, extFilter)).collect(Collectors.toList());
+        Stream<File> stream = files.stream().filter(file -> match(file, extFilter));
+        List<File> filteredFiles = stream.collect(Collectors.toList());
+        logger.exiting("ListViewFXMLController", "filterSupportedFiles", filteredFiles);
+        return filteredFiles;
     }
 
     private boolean match(File file, ExtensionFilter extFilter)
     {
+        logger.entering("ListViewFXMLController", "match", new Object[]{file, extFilter});
         List<String> extensions = extFilter.getExtensions();
-        return extensions.stream().anyMatch(extension -> match(file, extension, false));
+        Stream<String> stream = extensions.stream();
+        boolean result = stream.anyMatch(extension -> match(file, extension, false));
+        logger.exiting("ListViewFXMLController", "match", result);
+        return result;
     }
 
     private boolean match(File file, String extension, boolean abs)
     {
+        logger.entering("ListViewFXMLController", "match", new Object[]{file, extension, abs});
         String name = file.getName();
         if (abs)
             name = file.getAbsolutePath();
         String pattern = extension.replace("*.", ".*\\.");
-        return name.matches(pattern);
+        boolean result = name.matches(pattern);
+        logger.exiting("ListViewFXMLController", "match", result);
+        return result;
     }
 }

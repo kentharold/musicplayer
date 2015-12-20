@@ -33,6 +33,8 @@ public abstract class AbstractFXMLController
 
     public AbstractFXMLController(Application application, Stage stage)
     {
+        if (application == null || stage == null)
+            throw new NullPointerException("neither the application nor the stage can be null.");
         controller = this;
         this.application = application;
         this.stage = stage;
@@ -40,6 +42,7 @@ public abstract class AbstractFXMLController
 
     public static String localize(String key)
     {
+        logger.entering("AbstractFXMLController", "localize", key);
         String result = null;
         if (controller != null && controller.resources != null)
         {
@@ -54,6 +57,7 @@ public abstract class AbstractFXMLController
         }
         if (result == null)
             result = key;
+        logger.entering("AbstractFXMLController", "localize", result);
         return result;
     }
 

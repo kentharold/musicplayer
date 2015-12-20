@@ -45,39 +45,24 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
     private Label currentTimeLabel;
     @FXML
     private Label totalTimeLabel;
-    private BooleanProperty currentDurationChangingInternally = new SimpleBooleanProperty();
-    private ChangeListener<Duration> currentTimeChangeListener = (observable, oldValue, newValue) -> {
-        if (newValue != null)
-        {
-            long currentMillis = (long) newValue.toMillis();
-            currentDurationProperty().set(currentMillis);
-            currentDurationChangingInternally.set(true);
-            double duration = (newValue.toMillis() / totalDurationProperty().get()) * 100;
-            currentProgressProperty().set(duration);
-            currentDurationChangingInternally.set(false);
-        }
-    };
-    private ChangeListener<Duration> totalTimeChangeListener = (observable, oldValue, newValue) -> {
-        if (newValue != null)
-        {
-            totalDurationProperty().set((long) newValue.toMillis());
-        }
-    };
-    private ChangeListener<? super Number> currentProgressChangeListener = (observable, oldValue, newValue) -> {
-        if (newValue != null && !currentDurationChangingInternally.get())
-        {
-            seek(newValue.doubleValue());
-        }
-    };
+    private BooleanProperty currentDurationChangingInternally;
+    private ChangeListener<Duration> currentTimeChangeListener;
+    private ChangeListener<Duration> totalTimeChangeListener;
+    private ChangeListener<? super Number> currentProgressChangeListener;
 
     public MusicPlayerFXMLController(Application application, Stage stage)
     {
         super(application, stage);
+        currentDurationChangingInternally = new SimpleBooleanProperty();
+        totalTimeChangeListener = this::fireTotalTimeChanged;
+        currentProgressChangeListener = this::fireCurrentProgressChanged;
+        currentTimeChangeListener = this::currentTimeChanged;
     }
 
     @Override
     protected final void onEndOfMedia()
     {
+        logger.entering("MusicPlayerFXMLController", "onEndOfMedia");
         if (computeRepeat() != 1)
         {
             stop();
@@ -86,11 +71,13 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
             if (isPlaySelected())
                 mediaPlayer.play();
         }
+        logger.exiting("MusicPlayerFXMLController", "onEndOfMedia");
     }
 
     @Override
     protected final int compute(int offset)
     {
+        logger.entering("MusicPlayerFXMLController", "compute", offset);
         if (getData().isEmpty())
             return -1;
         int index = getLoadedIndex();
@@ -100,6 +87,7 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
         index = index % getData().size();
         if (offset < 0 && index < 0)
             index += getData().size();
+        logger.exiting("MusicPlayerFXMLController", "compute", index);
         return index;
     }
 
@@ -130,6 +118,7 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
     @Override
     protected int computeRepeat()
     {
+        logger.entering("MusicPlayerFXMLController", "computeRepeat");
         int repeat = -1;
         if (!repeatCheckBox.isSelected() && !repeatCheckBox.isIndeterminate())
             repeat = 0;
@@ -137,14 +126,15 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
             repeat = 1;
         else if (repeatCheckBox.isIndeterminate())
             repeat = 2;
-        if (repeat == -1)
-            throw new IllegalStateException();
+        assert repeat == 0 || repeat == 1 || repeat == 2;
+        logger.exiting("MusicPlayerFXMLController", "computeRepeat", repeat);
         return repeat;
     }
 
     @Override
     protected void updateMediaPlayer(ObservableValue<? extends MediaPlayer> observable, MediaPlayer oldValue, MediaPlayer newValue)
     {
+        logger.entering("MusicPlayerFXMLController", "updateMediaPlayer", new Object[]{observable, oldValue, newValue});
         if (oldValue != null)
         {
             oldValue.currentTimeProperty().removeListener(currentTimeChangeListener);
@@ -161,11 +151,13 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
                 totalDurationProperty().set((long) newValue.getTotalDuration().toMillis());
             }
         }
+        logger.exiting("MusicPlayerFXMLController", "updateMediaPlayer");
     }
 
     @Override
     void initialize()
     {
+        logger.entering("MusicPlayerFXMLController", "initialize");
         super.initialize();
         BooleanBinding isDataEmpty = Bindings.isEmpty(getData());
         BooleanBinding isNoAudioLoaded = Bindings.valueAt(getData(), loadedIndexProperty()).isNull();
@@ -183,11 +175,13 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
         totalTimeLabel.textProperty().bind(Bindings.format("%1$tM:%1$tS", totalDurationProperty()));
         durationSlider.valueProperty().bindBidirectional(currentProgressProperty());
         currentProgressProperty().addListener(currentProgressChangeListener);
+        logger.exiting("MusicPlayerFXMLController", "initialize");
     }
 
     @Override
     void onAction(ActionEvent event)
     {
+        logger.entering("MusicPlayerFXMLController", "onAction", event);
         super.onAction(event);
         if (event.isConsumed())
             return;
@@ -223,13 +217,49 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
             Object obj = listCell.getItem();
             if (obj instanceof Audio)
             {
-                Audio audio = (Audio) obj;
                 stop();
+                Audio audio = (Audio) obj;
                 step(audio);
                 if (isPlaySelected())
                     audio.getMediaPlayer().play();
-                event.consume();
             }
+            event.consume();
         }
+        logger.entering("MusicPlayerFXMLController", "onAction");
+    }
+
+    private void currentTimeChanged(ObservableValue<? extends Duration> observableValue, Duration oldValue, Duration newValue)
+    {
+        logger.entering("MusicPlayerFXMLController", "currentTimeChanged", new Object[]{observableValue, oldValue, newValue});
+        if (newValue != null)
+        {
+            long currentMillis = (long) newValue.toMillis();
+            currentDurationProperty().set(currentMillis);
+            currentDurationChangingInternally.set(true);
+            double duration = (newValue.toMillis() / totalDurationProperty().get()) * 100;
+            currentProgressProperty().set(duration);
+            currentDurationChangingInternally.set(false);
+        }
+        logger.exiting("MusicPlayerFXMLController", "currentTimeChanged");
+    }
+
+    private void fireTotalTimeChanged(ObservableValue<? extends Duration> obs, Duration oldValue, Duration newValue)
+    {
+        logger.entering("MusicPlayerFXMLController", "fireTotalTimeChanged", new Object[]{obs, oldValue, newValue});
+        if (newValue != null)
+        {
+            totalDurationProperty().set((long) newValue.toMillis());
+        }
+        logger.exiting("MusicPlayerFXMLController", "fireTotalTimeChanged");
+    }
+
+    private void fireCurrentProgressChanged(ObservableValue<? extends Number> obs, Number oldValue, Number newValue)
+    {
+        logger.entering("MusicPlayerFXMLController", "fireCurrentProgressChanged", new Object[]{obs, oldValue, newValue});
+        if (newValue != null && !currentDurationChangingInternally.get())
+        {
+            seek(newValue.doubleValue());
+        }
+        logger.exiting("MusicPlayerFXMLController", "fireCurrentProgressChanged");
     }
 }

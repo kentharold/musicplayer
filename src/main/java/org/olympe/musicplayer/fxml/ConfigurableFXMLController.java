@@ -33,7 +33,9 @@ public abstract class ConfigurableFXMLController extends AbstractFXMLController
      */
     public final void collectOptions()
     {
+        logger.entering("ConfigurableFXMLController", "collectOptions");
         collectOptions(options);
+        logger.exiting("ConfigurableFXMLController", "collectOptions");
     }
 
     protected abstract void collectOptions(ObservableList<Item> options);
@@ -43,6 +45,7 @@ public abstract class ConfigurableFXMLController extends AbstractFXMLController
     @Override
     void onAction(ActionEvent event)
     {
+        logger.entering("ConfigurableFXMLController", "onAction", event);
         if (event.isConsumed())
             return;
         Object source = event.getSource();
@@ -51,22 +54,27 @@ public abstract class ConfigurableFXMLController extends AbstractFXMLController
             showOptions();
             event.consume();
         }
+        logger.exiting("ConfigurableFXMLController", "onAction");
     }
 
     @Override
     void initialize()
     {
+        logger.entering("ConfigurableFXMLController", "initialize");
         optionsButton.disableProperty().bind(Bindings.isEmpty(options));
         optionsButton.visibleProperty().bind(Bindings.isNotEmpty(options));
         optionsButton.managedProperty().bind(Bindings.isNotEmpty(options));
+        logger.exiting("ConfigurableFXMLController", "initialize");
     }
 
     private void showOptions()
     {
+        logger.entering("ConfigurableFXMLController", "showOptions");
         if (sheet == null)
         {
             sheet = new PropertySheet(options);
         }
         showOptions(sheet);
+        logger.exiting("ConfigurableFXMLController", "showOptions");
     }
 }
