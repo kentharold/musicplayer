@@ -202,3 +202,7 @@
 .dialog-pane {
     -fx-background-color: derive(-fx-base, -70%);
 }
+
+.tooltip {
+    -fx-wrap-text: true;
+}

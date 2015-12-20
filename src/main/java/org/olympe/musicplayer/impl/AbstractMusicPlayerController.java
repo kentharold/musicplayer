@@ -210,7 +210,7 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
                 index = musicFiles.indexOf(musicFile);
                 if (index == -1) {
                     // the current playerwas removed while loaded.
-                    Platform.runLater(() ->{
+                    Platform.runLater(() -> {
                         currentIndexChangingInternally.set(true);
                         gotoTrack(+1);
                         currentIndexChangingInternally.set(false);
@@ -340,8 +340,7 @@ public abstract class AbstractMusicPlayerController implements MusicPlayerContro
             int index = currentIndex.get() + offset;
             if (repeat.get() == 1)
                 index = index % musicFiles.getSize();
-            if (index >= 0 && index < musicFiles.size())
-            {
+            if (index >= 0 && index < musicFiles.size()) {
                 File file = musicFiles.get(index);
                 MediaPlayer player = mediaPlayers.get(file);
                 currentMediaPlayer.set(player);

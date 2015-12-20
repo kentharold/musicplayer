@@ -15,16 +15,22 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import org.controlsfx.control.PropertySheet.Item;
+import org.controlsfx.property.BeanPropertyUtils;
+import org.olympe.musicplayer.impl.fxml.configurator.WindowConfigurator;
+import org.olympe.musicplayer.impl.util.BeanPropertyWrapper;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This controller abstraction allows the end user
  * to toggle the window to full screen, minimize,
  * maximize, resize, move or close it.
  */
-public abstract class UndecoratedFXMLController extends AbstractFXMLController {
+public abstract class UndecoratedFXMLController extends ConfigurableFXMLController {
 
     @FXML
     private Button fullscreenButton;
@@ -43,6 +49,7 @@ public abstract class UndecoratedFXMLController extends AbstractFXMLController {
     private double mouseDragOffsetY;
     private BoundingBox savedBounds;
     private boolean maximized = false;
+    private WindowConfigurator configurator = new WindowConfigurator();
 
     public UndecoratedFXMLController(Application application, Stage stage) {
         super(application, stage);
@@ -50,6 +57,7 @@ public abstract class UndecoratedFXMLController extends AbstractFXMLController {
 
     @Override
     void onAction(ActionEvent event) {
+        super.onAction(event);
         if (event.isConsumed())
             return;
         Object source = event.getSource();
@@ -303,4 +311,12 @@ public abstract class UndecoratedFXMLController extends AbstractFXMLController {
         Platform.exit();
         System.exit(status);
     }
+
+    @Override
+    protected void collectOptions(ObservableList<Item> options) {
+        Stream<Item> stream = BeanPropertyUtils.getProperties(configurator).stream();
+        stream = stream.map(BeanPropertyWrapper::new);
+        options.addAll(stream.collect(Collectors.toList()));
+    }
+
 }

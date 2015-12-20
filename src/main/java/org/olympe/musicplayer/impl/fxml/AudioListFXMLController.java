@@ -63,7 +63,7 @@ public abstract class AudioListFXMLController extends ListViewFXMLController<Aud
 
     @Override
     protected final void registerExtensionFilters(List<ExtensionFilter> extFilters) {
-        String description = getResources().getString("ExtensionFilter.description");
+        String description = localize("ExtensionFilter.description");
         List<String> extensions = new ArrayList<>();
         registerAudioExtensions(extensions);
         ExtensionFilter extFilter = new ExtensionFilter(description, extensions);
@@ -87,7 +87,7 @@ public abstract class AudioListFXMLController extends ListViewFXMLController<Aud
 
     @Override
     protected Node createPlaceholder() {
-        String msg = getResources().getString("DataView.PlaceHolder.msg");
+        String msg = localize("DataView.PlaceHolder.msg");
         Label msgLabel = new Label(msg);
         msgLabel.setWrapText(true);
         return new StackPane(msgLabel);

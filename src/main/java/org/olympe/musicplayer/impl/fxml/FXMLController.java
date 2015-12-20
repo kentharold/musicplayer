@@ -1,13 +1,28 @@
 package org.olympe.musicplayer.impl.fxml;
 
 import javafx.application.Application;
-import javafx.scene.input.*;
+import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.InputMethodEvent;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.RotateEvent;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.input.SwipeEvent;
+import javafx.scene.input.TouchEvent;
+import javafx.scene.input.ZoomEvent;
 import javafx.stage.Stage;
 
 public class FXMLController extends MusicPlayerFXMLController {
 
     public FXMLController(Application application, Stage stage) {
         super(application, stage);
+    }
+
+    @Override
+    void initialize() {
+        super.initialize();
+        collectOptions();
     }
 
     @Override

@@ -3,13 +3,27 @@ package org.olympe.musicplayer.impl.fxml;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.input.*;
+import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.InputMethodEvent;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.RotateEvent;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.input.SwipeEvent;
+import javafx.scene.input.TouchEvent;
+import javafx.scene.input.ZoomEvent;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 public abstract class AbstractFXMLController {
+
+    protected static final Logger logger = Logger.getLogger("FXML-Controller");
+    private static AbstractFXMLController localizator;
 
     private final Application application;
     private final Stage stage;
@@ -19,8 +33,23 @@ public abstract class AbstractFXMLController {
     private URL location;
 
     public AbstractFXMLController(Application application, Stage stage) {
+        localizator = this;
         this.application = application;
         this.stage = stage;
+    }
+
+    public static String localize(String key) {
+        String result = null;
+        if (localizator != null && localizator.resources != null) {
+            try {
+                result = localizator.resources.getString(key);
+            } catch (MissingResourceException e) {
+                logger.warning(e.getLocalizedMessage());
+            }
+        }
+        if (result == null)
+            result = key;
+        return result;
     }
 
     public final Application getApplication() {
@@ -29,14 +58,6 @@ public abstract class AbstractFXMLController {
 
     public final Stage getStage() {
         return stage;
-    }
-
-    public final ResourceBundle getResources() {
-        return resources;
-    }
-
-    public final URL getLocation() {
-        return location;
     }
 
     @FXML

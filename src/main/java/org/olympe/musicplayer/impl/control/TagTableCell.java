@@ -14,6 +14,11 @@ public class TagTableCell<S, T> extends TextFieldTableCell<S, T> {
         super(converter);
     }
 
+    public static <S, T> Callback<TableColumn<S, T>, TableCell<S, T>> forTableColumn(
+            final StringConverter<T> converter) {
+        return list -> new TagTableCell<>(converter);
+    }
+
     @Override
     public void updateItem(T item, boolean empty) {
         setTooltip(null);
@@ -21,10 +26,5 @@ public class TagTableCell<S, T> extends TextFieldTableCell<S, T> {
         if (!empty && item != null) {
             setTooltip(new Tooltip(getText()));
         }
-    }
-
-    public static <S,T> Callback<TableColumn<S,T>, TableCell<S,T>> forTableColumn(
-            final StringConverter<T> converter) {
-        return list -> new TagTableCell<>(converter);
     }
 }

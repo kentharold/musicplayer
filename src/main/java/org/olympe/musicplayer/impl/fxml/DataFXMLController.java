@@ -17,7 +17,6 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static javafx.stage.FileChooser.ExtensionFilter;
@@ -25,9 +24,7 @@ import static javafx.stage.FileChooser.ExtensionFilter;
 /**
  *
  */
-public abstract class DataFXMLController<T> extends UndecoratedFXMLController {
-
-    protected static final Logger logger = Logger.getLogger("FXML-Controller");
+public abstract class DataFXMLController<T> extends InternalNotifierFXMLController {
 
     @FXML
     private Button addDataButton;
@@ -44,6 +41,7 @@ public abstract class DataFXMLController<T> extends UndecoratedFXMLController {
 
     @Override
     void initialize() {
+        super.initialize();
         data.addListener(this::onDataListChanged);
         SelectionModel selection = getSelectionModel();
         ObservableBooleanValue isSelectionEmpty = Bindings.isNull(selection.selectedItemProperty());
@@ -110,7 +108,7 @@ public abstract class DataFXMLController<T> extends UndecoratedFXMLController {
     private FileChooser createFileChooser() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        fileChooser.setTitle(getResources().getString("FileChooser.title"));
+        fileChooser.setTitle(localize("FileChooser.title"));
         List<ExtensionFilter> extFilters = fileChooser.getExtensionFilters();
         registerExtensionFilters(extFilters);
         ExtensionFilter selected = getSelectedExtensionFilter(extFilters);
