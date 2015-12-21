@@ -2,6 +2,7 @@ package org.olympe.musicplayer.fxml;
 
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -42,6 +43,8 @@ public abstract class ConfigurableFXMLController extends AbstractFXMLController
 
     protected abstract void showOptions(PropertySheet sheet);
 
+    protected abstract BooleanProperty optionsViewVisible();
+
     @Override
     void onAction(ActionEvent event)
     {
@@ -62,8 +65,8 @@ public abstract class ConfigurableFXMLController extends AbstractFXMLController
     {
         logger.entering("ConfigurableFXMLController", "initialize");
         optionsButton.disableProperty().bind(Bindings.isEmpty(options));
-        optionsButton.visibleProperty().bind(Bindings.isNotEmpty(options));
-        optionsButton.managedProperty().bind(Bindings.isNotEmpty(options));
+        optionsButton.visibleProperty().bind(Bindings.isNotEmpty(options).and(optionsViewVisible().not()));
+        optionsButton.managedProperty().bind(Bindings.isNotEmpty(options).and(optionsViewVisible().not()));
         logger.exiting("ConfigurableFXMLController", "initialize");
     }
 

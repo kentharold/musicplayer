@@ -41,11 +41,17 @@ public class DefaultFXMLController extends CoverImageFXMLController
         loader.setController(this);
         Parent busyNode = new BorderPane(new Label("loading the application"));
         Scene scene = new Scene(busyNode, 600, 480);
-        URL css = ClassLoader.getSystemResource(CSS_NAME);
-        scene.getStylesheets().add(css.toExternalForm());
+        scene.getStylesheets().add(getDefaultStyleSheet());
         stage.setScene(scene);
         stage.setTitle("Olympe Music Player");
         Platform.runLater(() -> initialize(scene, loader));
+    }
+
+    @Override
+    protected String getDefaultStyleSheet()
+    {
+        URL css = ClassLoader.getSystemResource(CSS_NAME);
+        return css.toExternalForm();
     }
 
     @Override

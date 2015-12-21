@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import javafx.application.Application;
+import javafx.beans.property.BooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -54,6 +55,12 @@ public abstract class InternalNotifierFXMLController extends UndecoratedFXMLCont
         Node graphic = new FontAwesomeIconView(FontAwesomeIcon.COG);
         notify(title, graphic, sheet, ButtonData.CANCEL_CLOSE);
         logger.exiting("InternalNotifierFXMLController", "showOptions");
+    }
+
+    @Override
+    protected BooleanProperty optionsViewVisible()
+    {
+        return overlayPane.visibleProperty();
     }
 
     @Override

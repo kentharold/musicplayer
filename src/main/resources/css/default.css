@@ -1,4 +1,5 @@
 .root {
+    /* an alternative is #CCCCCC*/
     -fx-base: #deaddc;
     -fx-color: -fx-base;
     -fx-background: derive(-fx-base, 10%);
