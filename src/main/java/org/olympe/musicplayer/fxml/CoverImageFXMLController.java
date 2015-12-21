@@ -60,6 +60,7 @@ public abstract class CoverImageFXMLController extends MusicPlayerFXMLController
         super(application, stage);
         configurator = new AppearanceConfigurator();
         configurator.colorProperty().addListener(this::fireDefaultThemeColorChanged);
+        configurator.useCoverPredominantColorProperty().addListener(this::fireUsePredominantColorChanged);
     }
 
     private static Image getImage(Artwork artwork)
@@ -160,8 +161,8 @@ public abstract class CoverImageFXMLController extends MusicPlayerFXMLController
             Artwork artwork = tag.getFirstArtwork();
             Image image = getImage(artwork);
             updateCoverImage(image);
-            updateThemeColor(image);
         }
+        updateThemeColor();
         logger.exiting("CoverImageFXMLController", "updateAudio");
     }
 
@@ -195,8 +196,34 @@ public abstract class CoverImageFXMLController extends MusicPlayerFXMLController
 
     private void fireDefaultThemeColorChanged(ObservableValue<? extends Color> observable, Color oldValue, Color newValue)
     {
-        if (newValue != null && !configurator.getUseCoverPredominantColor())
-            setThemeColor(newValue);
+        updateThemeColor();
+    }
+
+    private Image getImage(Audio audio)
+    {
+        Image image = null;
+        if (audio != null)
+        {
+            Tag tag = audio.getTag();
+            Artwork artwork = tag.getFirstArtwork();
+            if (artwork != null)
+                image = getImage(artwork);
+        }
+        return image;
+    }
+
+    private void fireUsePredominantColorChanged(ObservableValue<? extends Boolean> obs, Boolean oldValue, Boolean newValue)
+    {
+        updateThemeColor();
+    }
+
+    private void updateThemeColor()
+    {
+        Image image = getImage(getLoadedAudio());
+        Color color = configurator.getColor();
+        if (configurator.getUseCoverPredominantColor() && image != null)
+            color = getThemeColor(image);
+        setThemeColor(color);
     }
 
     private void setThemeColor(Color color)

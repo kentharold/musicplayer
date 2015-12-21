@@ -67,7 +67,7 @@ public abstract class AbstractMusicPlayerFXMLController extends AudioListFXMLCon
     public final void stop()
     {
         logger.entering("AbstractMusicPlayerFXMLController", "stop");
-        MediaPlayer mediaPlayer = getLoadedAudio();
+        MediaPlayer mediaPlayer = getLoadedMediaPlayer();
         if (mediaPlayer != null)
             mediaPlayer.stop();
         logger.exiting("AbstractMusicPlayerFXMLController", "stop");
@@ -76,7 +76,7 @@ public abstract class AbstractMusicPlayerFXMLController extends AudioListFXMLCon
     public final boolean isPlaying()
     {
         logger.entering("AbstractMusicPlayerFXMLController", "isPlaying");
-        MediaPlayer mediaPlayer = getLoadedAudio();
+        MediaPlayer mediaPlayer = getLoadedMediaPlayer();
         MediaPlayer.Status status = null;
         if (mediaPlayer != null)
             status = mediaPlayer.getStatus();
@@ -111,7 +111,7 @@ public abstract class AbstractMusicPlayerFXMLController extends AudioListFXMLCon
     public final void setPlay(boolean play)
     {
         logger.entering("AbstractMusicPlayerFXMLController", "setPlay", play);
-        MediaPlayer mediaPlayer = getLoadedAudio();
+        MediaPlayer mediaPlayer = getLoadedMediaPlayer();
         if (play)
             mediaPlayer.play();
         else
@@ -152,13 +152,18 @@ public abstract class AbstractMusicPlayerFXMLController extends AudioListFXMLCon
         return loadedIndex;
     }
 
-    public final MediaPlayer getLoadedAudio()
+    public final MediaPlayer getLoadedMediaPlayer()
     {
         Audio audio = loadedAudio.get();
         MediaPlayer player = null;
         if (audio != null)
             player = audio.getMediaPlayer();
         return player;
+    }
+
+    public final Audio getLoadedAudio()
+    {
+        return loadedAudio.get();
     }
 
     public final DoubleProperty currentProgressProperty()
@@ -179,7 +184,7 @@ public abstract class AbstractMusicPlayerFXMLController extends AudioListFXMLCon
     public final void seek(double value)
     {
         logger.entering("AbstractMusicPlayerFXMLController", "seek", value);
-        MediaPlayer player = getLoadedAudio();
+        MediaPlayer player = getLoadedMediaPlayer();
         if (player != null)
         {
             // can only seek when the player is ready.

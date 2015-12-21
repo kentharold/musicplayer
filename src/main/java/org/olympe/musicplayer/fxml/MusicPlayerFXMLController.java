@@ -67,7 +67,7 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
         {
             stop();
             step(+1);
-            MediaPlayer mediaPlayer = getLoadedAudio();
+            MediaPlayer mediaPlayer = getLoadedMediaPlayer();
             if (isPlaySelected())
                 mediaPlayer.play();
         }

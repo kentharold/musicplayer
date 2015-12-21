@@ -27,6 +27,7 @@ import org.controlsfx.property.BeanPropertyUtils;
 
 import org.olympe.musicplayer.bean.configurator.WindowConfigurator;
 import org.olympe.musicplayer.util.BeanPropertyWrapper;
+import static com.sun.javafx.PlatformUtil.isWin7OrLater;
 
 /**
  * <p> This controller abstraction allows the end user to toggle the window to full screen, minimize, maximize, resize,
@@ -272,8 +273,11 @@ public abstract class UndecoratedFXMLController extends ConfigurableFXMLControll
                 stage.setY(y);
                 event.consume();
             }
-            else if (source == root && canProcessMouseDrag && !isMaximized())
+            else if (source == root && canProcessMouseDrag && !isMaximized() && isWin7OrLater())
             {
+                // Resize function is only test on windows
+                // and is not by default supported
+                // that is why this bloc was added.
                 Cursor cursor = root.getCursor();
                 if (cursor == Cursor.DEFAULT || event.isStillSincePress())
                     return;
@@ -354,10 +358,13 @@ public abstract class UndecoratedFXMLController extends ConfigurableFXMLControll
         if (!event.isConsumed())
         {
             Object source = event.getSource();
-            if (source == root && !isMaximized() && !isFullScreen())
+            if (source == root && !isMaximized() && !isFullScreen() && isWin7OrLater())
             {
-                // change the cursor for resize.
+                // Resize function is only test on windows
+                // and is not by default supported
+                // that is why this bloc was added.
                 root.setCursor(Cursor.DEFAULT);
+                // change the cursor for resize.
                 double width = getStage().getWidth();
                 double height = getStage().getHeight();
                 double x = event.getSceneX() - width;
