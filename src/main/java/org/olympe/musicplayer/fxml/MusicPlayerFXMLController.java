@@ -1,6 +1,12 @@
 package org.olympe.musicplayer.fxml;
 
+import java.io.File;
+import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
@@ -20,6 +26,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import org.olympe.musicplayer.bean.configurator.PlayerConfigurator;
 import org.olympe.musicplayer.bean.model.Audio;
 
 /**
@@ -49,14 +56,18 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
     private ChangeListener<Duration> currentTimeChangeListener;
     private ChangeListener<Duration> totalTimeChangeListener;
     private ChangeListener<? super Number> currentProgressChangeListener;
+    private PlayerConfigurator configurator;
 
     public MusicPlayerFXMLController(Application application, Stage stage)
     {
         super(application, stage);
+        configurator = new PlayerConfigurator(getPreferencesNode("player"));
+        addExitHandler(configurator::saveToPreferences);
         currentDurationChangingInternally = new SimpleBooleanProperty();
         totalTimeChangeListener = this::fireTotalTimeChanged;
         currentProgressChangeListener = this::fireCurrentProgressChanged;
         currentTimeChangeListener = this::currentTimeChanged;
+        addExitHandler(this::savePlayerState);
     }
 
     @Override
@@ -135,7 +146,6 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
     protected void updateAudio(ObservableValue<? extends Audio> observable, Audio oldValue, Audio newValue)
     {
         logger.entering("MusicPlayerFXMLController", "updateAudio", new Object[]{observable, oldValue, newValue});
-
         if (oldValue != null)
         {
             MediaPlayer player = oldValue.getMediaPlayer();
@@ -178,6 +188,7 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
         totalTimeLabel.textProperty().bind(Bindings.format("%1$tM:%1$tS", totalDurationProperty()));
         durationSlider.valueProperty().bindBidirectional(currentProgressProperty());
         currentProgressProperty().addListener(currentProgressChangeListener);
+        Platform.runLater(this::restorePlayerState);
         logger.exiting("MusicPlayerFXMLController", "initialize");
     }
 
@@ -229,6 +240,49 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
             event.consume();
         }
         logger.entering("MusicPlayerFXMLController", "onAction");
+    }
+
+    private void savePlayerState()
+    {
+        Preferences prefs = configurator.getPrefs();
+        prefs.putDouble("currentTime", durationSlider.getValue());
+        prefs.putDouble("volume", volumeSlider.getValue());
+        prefs.putBoolean("mute", muteToggleButton.isSelected());
+        prefs.putBoolean("repeatSelected", repeatCheckBox.isSelected());
+        prefs.putBoolean("repeatIndeterminate", repeatCheckBox.isIndeterminate());
+        prefs.putInt("currentIndex", getLoadedIndex());
+        Stream<Audio> audios = getData().stream();
+        Stream<File> files = audios.map(Audio::getFile);
+        Stream<String> pathNames = files.map(File::getAbsolutePath);
+        String dataStr = String.join(File.pathSeparator, pathNames.collect(Collectors.toList()));
+        if (dataStr.isEmpty())
+            dataStr = null;
+        prefs.put("data", dataStr);
+    }
+
+    private void restorePlayerState()
+    {
+        Preferences prefs = configurator.getPrefs();
+        volumeSlider.setValue(prefs.getDouble("volume", 0.5));
+        muteToggleButton.setSelected(prefs.getBoolean("mute", false));
+        repeatCheckBox.setSelected(prefs.getBoolean("repeatSelected", false));
+        repeatCheckBox.setIndeterminate(prefs.getBoolean("repeatIndeterminate", false));
+        String dataStr = prefs.get("data", null);
+        if (dataStr != null)
+        {
+            Stream<String> pathNames = Stream.of(dataStr.split(File.pathSeparator));
+            Stream<File> files = pathNames.map(File::new);
+            Stream<Audio> audios = files.map(this::mapDataFromFile);
+            getData().addAll(audios.collect(Collectors.toList()));
+            int index = prefs.getInt("currentIndex", -1);
+            if (index >= 0 && index < getData().size())
+            {
+                Audio audio = getData().get(index);
+                loadedIndexProperty().set(index);
+                loadedAudioProperty().set(audio);
+                // currentProgressProperty().set(prefs.getDouble("currentTime", 0.0));
+            }
+        }
     }
 
     private void currentTimeChanged(ObservableValue<? extends Duration> observableValue, Duration oldValue, Duration newValue)

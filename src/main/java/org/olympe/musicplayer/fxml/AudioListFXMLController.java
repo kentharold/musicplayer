@@ -34,11 +34,13 @@ import org.olympe.musicplayer.util.BeanPropertyWrapper;
  */
 public abstract class AudioListFXMLController extends ListViewFXMLController<Audio>
 {
-    private final AudioListConfigurator configurator = new AudioListConfigurator();
+    private final AudioListConfigurator configurator;
 
     public AudioListFXMLController(Application application, Stage stage)
     {
         super(application, stage);
+        configurator = new AudioListConfigurator(getPreferencesNode("view/playqueue"));
+        addExitHandler(configurator::saveToPreferences);
     }
 
     @Override

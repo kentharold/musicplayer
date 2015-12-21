@@ -1,5 +1,7 @@
 package org.olympe.musicplayer.bean.configurator;
 
+import java.util.prefs.Preferences;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -11,15 +13,20 @@ import jfxtras.labs.util.Util;
 /**
  *
  */
-public class AppearanceConfigurator
+public class AppearanceConfigurator extends Configurator
 {
     private ObjectProperty<Color> color;
     private BooleanProperty useCoverPredominantColor;
 
+    public AppearanceConfigurator(Preferences prefs)
+    {
+        super(prefs);
+    }
+
     public ObjectProperty<Color> colorProperty()
     {
         if (color == null)
-            color = new SimpleObjectProperty<>(this, "color", Util.webColorToColor("#deaddc"));
+            color = new SimpleObjectProperty<>(this, "color", Util.webColorToColor(prefs.get("color", "#deaddc")));
         return color;
     }
 
@@ -35,8 +42,9 @@ public class AppearanceConfigurator
 
     public BooleanProperty useCoverPredominantColorProperty()
     {
+        String key = "useCoverPredominantColor";
         if (useCoverPredominantColor == null)
-            useCoverPredominantColor = new SimpleBooleanProperty(this, "useCoverPredominantColor", true);
+            useCoverPredominantColor = new SimpleBooleanProperty(this, key, prefs.getBoolean(key, true));
         return useCoverPredominantColor;
     }
 
@@ -48,5 +56,12 @@ public class AppearanceConfigurator
     public void setUseCoverPredominantColor(boolean useCoverPredominantColor)
     {
         useCoverPredominantColorProperty().set(useCoverPredominantColor);
+    }
+
+    @Override
+    public void saveToPreferences()
+    {
+        prefs.put("color", Util.colorToWebColor(getColor()));
+        prefs.putBoolean("useCoverPredominantColor", getUseCoverPredominantColor());
     }
 }

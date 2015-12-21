@@ -1,5 +1,7 @@
 package org.olympe.musicplayer.bean.configurator;
 
+import java.util.prefs.Preferences;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -9,20 +11,24 @@ import javafx.util.StringConverter;
 import org.olympe.musicplayer.bean.model.Audio;
 import org.olympe.musicplayer.util.AudioStringConverter;
 import org.olympe.musicplayer.util.AudioStringConverter.Flag;
-import static org.olympe.musicplayer.bean.configurator.AudioListConfigurator.AudioListDisplayMode.FILE_NAME;
 import static org.olympe.musicplayer.fxml.AbstractFXMLController.localize;
 
 /**
  *
  */
-public class AudioListConfigurator
+public class AudioListConfigurator extends Configurator
 {
     private ObjectProperty<AudioListDisplayMode> displayMode;
+
+    public AudioListConfigurator(Preferences prefs)
+    {
+        super(prefs);
+    }
 
     public ObjectProperty<AudioListDisplayMode> displayModeProperty()
     {
         if (displayMode == null)
-            displayMode = new SimpleObjectProperty<>(this, "displayMode", FILE_NAME);
+            displayMode = new SimpleObjectProperty<>(this, "displayMode", AudioListDisplayMode.valueOf(prefs.get("displayMode", "FILE_NAME")));
         return displayMode;
     }
 
@@ -34,6 +40,12 @@ public class AudioListConfigurator
     public void setDisplayMode(AudioListDisplayMode displayMode)
     {
         displayModeProperty().set(displayMode);
+    }
+
+    @Override
+    public void saveToPreferences()
+    {
+        prefs.put("displayMode", getDisplayMode().name());
     }
 
     public enum AudioListDisplayMode

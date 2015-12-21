@@ -59,7 +59,7 @@ public class BeanPropertyWrapper implements Item
     }
 
     @Override
-    public Optional<ObservableValue<? extends Object>> getObservableValue()
+    public Optional<ObservableValue<?>> getObservableValue()
     {
         return delegateBeanProperty.getObservableValue();
     }

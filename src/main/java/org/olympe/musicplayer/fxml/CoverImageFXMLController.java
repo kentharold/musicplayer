@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -31,11 +32,11 @@ import org.controlsfx.property.BeanPropertyUtils;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.datatype.Artwork;
 
+import de.androidpit.colorthief.ColorThief;
 import jfxtras.labs.util.Util;
 import org.olympe.musicplayer.bean.configurator.AppearanceConfigurator;
 import org.olympe.musicplayer.bean.model.Audio;
 import org.olympe.musicplayer.util.BeanPropertyWrapper;
-import org.olympe.musicplayer.util.ColorThief;
 
 /**
  *
@@ -58,9 +59,10 @@ public abstract class CoverImageFXMLController extends MusicPlayerFXMLController
     public CoverImageFXMLController(Application application, Stage stage)
     {
         super(application, stage);
-        configurator = new AppearanceConfigurator();
+        configurator = new AppearanceConfigurator(getPreferencesNode("appearance"));
         configurator.colorProperty().addListener(this::fireDefaultThemeColorChanged);
         configurator.useCoverPredominantColorProperty().addListener(this::fireUsePredominantColorChanged);
+        addExitHandler(configurator::saveToPreferences);
     }
 
     private static Image getImage(Artwork artwork)
@@ -186,6 +188,7 @@ public abstract class CoverImageFXMLController extends MusicPlayerFXMLController
         Scene scene = getStage().getScene();
         coverView.fitWidthProperty().bind(scene.widthProperty());
         coverView.fitHeightProperty().bind(scene.heightProperty());
+        Platform.runLater(this::updateThemeColor);
     }
 
     private void updateCoverImage(Image image)
@@ -232,19 +235,5 @@ public abstract class CoverImageFXMLController extends MusicPlayerFXMLController
         if (styleSheet == null)
             styleSheet = getDefaultStyleSheet();
         getStage().getScene().getStylesheets().setAll(styleSheet);
-    }
-
-    private void updateThemeColor(Image image)
-    {
-        Color color;
-        if (configurator.getUseCoverPredominantColor() && image != null)
-        {
-            color = getThemeColor(image);
-        }
-        else
-        {
-            color = configurator.getColor();
-        }
-        setThemeColor(color);
     }
 }

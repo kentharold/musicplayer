@@ -2,6 +2,7 @@ package org.olympe.musicplayer.fxml;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -52,13 +53,18 @@ public abstract class UndecoratedFXMLController extends ConfigurableFXMLControll
     private double mouseDragOffsetY;
     private BoundingBox savedBounds;
     private boolean maximized = false;
-    private WindowConfigurator configurator = new WindowConfigurator();
+    private WindowConfigurator configurator;
+    private List<Runnable> exitHandlers = new ArrayList<>();
 
     public UndecoratedFXMLController(Application application, Stage stage)
     {
         super(application, stage);
         stage.initStyle(StageStyle.UNDECORATED);
         stage.setResizable(true);
+        configurator = new WindowConfigurator(getPreferencesNode("view/window"));
+        addExitHandler(configurator::saveToPreferences);
+        addExitHandler(this::saveWindowState);
+        Platform.runLater(this::restoreWindowState);
     }
 
     private static boolean isResizeCursor(Cursor cursor)
@@ -81,6 +87,16 @@ public abstract class UndecoratedFXMLController extends ConfigurableFXMLControll
         return result;
     }
 
+    public final void addExitHandler(Runnable exitHandler)
+    {
+        exitHandlers.add(exitHandler);
+    }
+
+    public final void removeExitHandler(Runnable exitHandler)
+    {
+        exitHandlers.remove(exitHandler);
+    }
+
     public final boolean isMaximized()
     {
         return maximized;
@@ -89,38 +105,37 @@ public abstract class UndecoratedFXMLController extends ConfigurableFXMLControll
     public final void setMaximized(boolean maximized)
     {
         logger.entering("UndecoratedFXMLController", "setMaximized", maximized);
-        Stage stage = getStage();
-        if (!Platform.isFxApplicationThread())
+        if (this.maximized != maximized)
         {
-            Platform.runLater(() -> setMaximized(maximized));
-            return;
-        }
-        if (!maximized)
-        {
-            stage.setX(savedBounds.getMinX());
-            stage.setY(savedBounds.getMinY());
-            stage.setWidth(savedBounds.getWidth());
-            stage.setHeight(savedBounds.getHeight());
-            savedBounds = null;
-            this.maximized = false;
-        }
-        else
-        {
-            double x = stage.getX();
-            double y = stage.getY();
-            double width = stage.getWidth();
-            double height = stage.getHeight();
-            Rectangle2D rect = new Rectangle2D(x, y, width, height);
-            ObservableList<Screen> screensForRectangle = null;
-            screensForRectangle = Screen.getScreensForRectangle(rect);
-            Screen screen = screensForRectangle.get(0);
-            Rectangle2D visualBounds = screen.getVisualBounds();
-            savedBounds = new BoundingBox(x, y, width, height);
-            stage.setX(visualBounds.getMinX());
-            stage.setY(visualBounds.getMinY());
-            stage.setWidth(visualBounds.getWidth());
-            stage.setHeight(visualBounds.getHeight());
-            this.maximized = true;
+            Stage stage = getStage();
+            if (!Platform.isFxApplicationThread())
+            {
+                Platform.runLater(() -> setMaximized(maximized));
+                return;
+            }
+            if (!maximized)
+            {
+                applySavedBounds();
+                this.maximized = false;
+            }
+            else
+            {
+                double x = stage.getX();
+                double y = stage.getY();
+                double width = stage.getWidth();
+                double height = stage.getHeight();
+                memorizeBounds();
+                Rectangle2D rect = new Rectangle2D(x, y, width, height);
+                ObservableList<Screen> screensForRectangle;
+                screensForRectangle = Screen.getScreensForRectangle(rect);
+                Screen screen = screensForRectangle.get(0);
+                Rectangle2D visualBounds = screen.getVisualBounds();
+                stage.setX(visualBounds.getMinX());
+                stage.setY(visualBounds.getMinY());
+                stage.setWidth(visualBounds.getWidth());
+                stage.setHeight(visualBounds.getHeight());
+                this.maximized = true;
+            }
         }
         logger.exiting("UndecoratedFXMLController", "setMaximized");
     }
@@ -177,6 +192,7 @@ public abstract class UndecoratedFXMLController extends ConfigurableFXMLControll
     public final void exit(int status)
     {
         logger.entering("UndecoratedFXMLController", "exit", status);
+        exitHandlers.stream().forEach(Runnable::run);
         getStage().close();
         Platform.exit();
         System.exit(status);
@@ -194,6 +210,15 @@ public abstract class UndecoratedFXMLController extends ConfigurableFXMLControll
     }
 
     @Override
+    void initialize()
+    {
+        super.initialize();
+        maximizeButton.disableProperty().bind(getStage().fullScreenProperty());
+        maximizeButton.managedProperty().bind(getStage().fullScreenProperty().not());
+        maximizeButton.visibleProperty().bind(getStage().fullScreenProperty().not());
+    }
+
+    @Override
     void onAction(ActionEvent event)
     {
         logger.entering("UndecoratedFXMLController", "onAction", event);
@@ -203,7 +228,18 @@ public abstract class UndecoratedFXMLController extends ConfigurableFXMLControll
             Object source = event.getSource();
             boolean consume = true;
             if (source == fullscreenButton)
+            {
+                Stage stage = getStage();
+                if (!isFullScreen())
+                {
+                    memorizeBounds();
+                }
                 toggleFullScreen();
+                if (!isFullScreen())
+                {
+                    Platform.runLater(this::applySavedBounds);
+                }
+            }
             else if (source == minimizeButton)
                 toggleMinimized();
             else if (source == maximizeButton)
@@ -310,7 +346,7 @@ public abstract class UndecoratedFXMLController extends ConfigurableFXMLControll
                 if (north && newY >= 0)
                 {
                     Rectangle2D rect = new Rectangle2D(x, y, width, height);
-                    ObservableList<Screen> screensForRectangle = null;
+                    ObservableList<Screen> screensForRectangle;
                     screensForRectangle = Screen.getScreensForRectangle(rect);
                     if (screensForRectangle.size() > 0)
                     {
@@ -401,5 +437,78 @@ public abstract class UndecoratedFXMLController extends ConfigurableFXMLControll
             }
         }
         logger.exiting("UndecoratedFXMLController", "onMouseMoved");
+    }
+
+    private void memorizeBounds()
+    {
+        Stage stage = getStage();
+        double x = stage.getX();
+        double y = stage.getY();
+        double width = stage.getWidth();
+        double height = stage.getHeight();
+        savedBounds = new BoundingBox(x, y, width, height);
+    }
+
+    private void applySavedBounds()
+    {
+        Stage stage = getStage();
+        stage.setX(savedBounds.getMinX());
+        stage.setY(savedBounds.getMinY());
+        stage.setWidth(savedBounds.getWidth());
+        stage.setHeight(savedBounds.getHeight());
+        savedBounds = null;
+    }
+
+    private void restoreWindowState()
+    {
+        if (configurator.getRememberWindowState())
+        {
+            Preferences prefs = configurator.getPrefs();
+            savedBounds = readBounds(prefs, "xBound", "yBound", "wBound", "hBound");
+            BoundingBox box = readBounds(prefs, "x", "y", "w", "h");
+            maximized = prefs.getBoolean("maximized", false);
+            boolean fullScreen = prefs.getBoolean("fullScreen", false);
+            if (box != null)
+            {
+                getStage().setX(box.getMinX());
+                getStage().setY(box.getMinY());
+                getStage().setWidth(box.getWidth());
+                getStage().setHeight(box.getHeight());
+            }
+            setFullScreen(fullScreen);
+        }
+    }
+
+    private void saveWindowState()
+    {
+        if (configurator.getRememberWindowState())
+        {
+            Preferences prefs = configurator.getPrefs();
+            writeBounds(savedBounds, prefs, "xBound", "yBound", "wBound", "hBound");
+            BoundingBox box = new BoundingBox(getStage().getX(), getStage().getY(), getStage().getWidth(), getStage().getHeight());
+            writeBounds(box, prefs, "x", "y", "w", "h");
+            prefs.putBoolean("maximized", maximized);
+            prefs.putBoolean("fullScreen", isFullScreen());
+        }
+    }
+
+    private void writeBounds(BoundingBox box, Preferences prefs, String xKey, String yKey, String wKey, String hKey)
+    {
+        prefs.putDouble(xKey, box != null ? box.getMinX() : -1);
+        prefs.putDouble(yKey, box != null ? box.getMinY() : -1);
+        prefs.putDouble(wKey, box != null ? box.getWidth() : -1);
+        prefs.putDouble(hKey, box != null ? box.getHeight() : -1);
+    }
+
+    private BoundingBox readBounds(Preferences prefs, String xKey, String yKey, String wKey, String hKey)
+    {
+        BoundingBox box = null;
+        double x = prefs.getDouble(xKey, -1);
+        double y = prefs.getDouble(yKey, -1);
+        double width = prefs.getDouble(wKey, -1);
+        double height = prefs.getDouble(hKey, -1);
+        if (x != -1 && y != -1 && width != -1 && height != -1)
+            box = new BoundingBox(x, y, width, height);
+        return box;
     }
 }

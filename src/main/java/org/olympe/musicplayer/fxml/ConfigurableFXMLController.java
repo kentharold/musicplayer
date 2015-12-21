@@ -1,5 +1,7 @@
 package org.olympe.musicplayer.fxml;
 
+import java.util.prefs.Preferences;
+
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -22,11 +24,18 @@ public abstract class ConfigurableFXMLController extends AbstractFXMLController
     private Button optionsButton;
     private ObservableList<Item> options;
     private PropertySheet sheet;
+    private Preferences rootPrefs;
 
     public ConfigurableFXMLController(Application application, Stage stage)
     {
         super(application, stage);
         options = FXCollections.observableArrayList();
+        rootPrefs = Preferences.userRoot().node("olympe/musicplayer");
+    }
+
+    public final Preferences getPreferencesNode(String node)
+    {
+        return rootPrefs.node(node);
     }
 
     /**

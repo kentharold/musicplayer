@@ -15,8 +15,7 @@
  * Lokesh Dhakar - for the original Color Thief JavaScript version
  * available at http://lokeshdhakar.com/projects/color-thief/
  */
-package org.olympe.musicplayer.util;
-
+package de.androidpit.colorthief;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

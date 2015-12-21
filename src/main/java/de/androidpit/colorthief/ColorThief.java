@@ -15,13 +15,13 @@
  * Lokesh Dhakar - for the original Color Thief JavaScript version
  * available at http://lokeshdhakar.com/projects/color-thief/
  */
-package org.olympe.musicplayer.util;
+package de.androidpit.colorthief;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.Arrays;
 
-import org.olympe.musicplayer.util.MMCQ.CMap;
+import de.androidpit.colorthief.MMCQ.CMap;
 
 public class ColorThief
 {

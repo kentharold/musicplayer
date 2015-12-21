@@ -120,8 +120,8 @@ public abstract class ListViewFXMLController<T> extends DataFXMLController<T>
         Object source = event.getSource();
         if (source instanceof ListCell)
         {
-            ListCell<T> listCell = (ListCell<T>) source;
-            ListView<T> listView = listCell.getListView();
+            ListCell listCell = (ListCell) source;
+            ListView listView = listCell.getListView();
             if (listView == dataView && event.getButton() == PRIMARY && event.getClickCount() == 2)
             {
                 runLater(() -> onAction(new ActionEvent(listCell, listCell)));
@@ -147,17 +147,15 @@ public abstract class ListViewFXMLController<T> extends DataFXMLController<T>
         logger.entering("ListViewFXMLController", "match", new Object[]{file, extFilter});
         List<String> extensions = extFilter.getExtensions();
         Stream<String> stream = extensions.stream();
-        boolean result = stream.anyMatch(extension -> match(file, extension, false));
+        boolean result = stream.anyMatch(extension -> match(file, extension));
         logger.exiting("ListViewFXMLController", "match", result);
         return result;
     }
 
-    private boolean match(File file, String extension, boolean abs)
+    private boolean match(File file, String extension)
     {
-        logger.entering("ListViewFXMLController", "match", new Object[]{file, extension, abs});
+        logger.entering("ListViewFXMLController", "match", new Object[]{file, extension, false});
         String name = file.getName();
-        if (abs)
-            name = file.getAbsolutePath();
         String pattern = extension.replace("*.", ".*\\.");
         boolean result = name.matches(pattern);
         logger.exiting("ListViewFXMLController", "match", result);

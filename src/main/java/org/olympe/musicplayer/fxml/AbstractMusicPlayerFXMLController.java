@@ -152,6 +152,11 @@ public abstract class AbstractMusicPlayerFXMLController extends AudioListFXMLCon
         return loadedIndex;
     }
 
+    public final ObjectProperty<Audio> loadedAudioProperty()
+    {
+        return loadedAudio;
+    }
+
     public final MediaPlayer getLoadedMediaPlayer()
     {
         Audio audio = loadedAudio.get();
