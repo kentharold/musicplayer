@@ -1,5 +1,6 @@
 package org.olympe.musicplayer.fxml;
 
+import java.beans.PropertyDescriptor;
 import java.util.prefs.Preferences;
 
 import javafx.application.Application;
@@ -46,6 +47,18 @@ public abstract class ConfigurableFXMLController extends AbstractFXMLController
         logger.entering("ConfigurableFXMLController", "collectOptions");
         collectOptions(options);
         logger.exiting("ConfigurableFXMLController", "collectOptions");
+    }
+
+    public boolean isValidProperty(PropertyDescriptor propertyDescriptor)
+    {
+        boolean valid = false;
+        if (propertyDescriptor != null)
+        {
+            String name = propertyDescriptor.getName();
+            if (!name.equals("prefs"))
+                valid = true;
+        }
+        return valid;
     }
 
     protected abstract void collectOptions(ObservableList<Item> options);

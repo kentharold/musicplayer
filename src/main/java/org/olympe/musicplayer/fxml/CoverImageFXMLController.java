@@ -175,7 +175,7 @@ public abstract class CoverImageFXMLController extends MusicPlayerFXMLController
     {
         logger.entering("CoverImageFXMLController", "collectOptions", options);
         super.collectOptions(options);
-        Stream<PropertySheet.Item> stream = BeanPropertyUtils.getProperties(configurator).stream();
+        Stream<PropertySheet.Item> stream = BeanPropertyUtils.getProperties(configurator, this::isValidProperty).stream();
         stream = stream.map(BeanPropertyWrapper::new);
         options.addAll(stream.collect(Collectors.toList()));
         logger.exiting("CoverImageFXMLController", "collectOptions");

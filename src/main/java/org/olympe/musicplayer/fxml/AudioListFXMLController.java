@@ -103,7 +103,7 @@ public abstract class AudioListFXMLController extends ListViewFXMLController<Aud
     {
         logger.entering("AudioListFXMLController", "collectOptions", options);
         super.collectOptions(options);
-        Stream<PropertySheet.Item> stream = BeanPropertyUtils.getProperties(configurator).stream();
+        Stream<PropertySheet.Item> stream = BeanPropertyUtils.getProperties(configurator, this::isValidProperty).stream();
         stream = stream.map(BeanPropertyWrapper::new);
         options.addAll(stream.collect(Collectors.toList()));
         logger.exiting("AudioListFXMLController", "collectOptions");

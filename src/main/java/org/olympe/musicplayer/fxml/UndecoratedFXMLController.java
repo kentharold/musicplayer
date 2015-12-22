@@ -203,7 +203,7 @@ public abstract class UndecoratedFXMLController extends ConfigurableFXMLControll
     protected void collectOptions(ObservableList<Item> options)
     {
         logger.entering("UndecoratedFXMLController", "collectOptions", options);
-        Stream<Item> stream = BeanPropertyUtils.getProperties(configurator).stream();
+        Stream<Item> stream = BeanPropertyUtils.getProperties(configurator, this::isValidProperty).stream();
         stream = stream.map(BeanPropertyWrapper::new);
         options.addAll(stream.collect(Collectors.toList()));
         logger.exiting("UndecoratedFXMLController", "collectOptions");
