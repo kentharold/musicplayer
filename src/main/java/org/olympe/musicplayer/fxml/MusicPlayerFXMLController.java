@@ -14,6 +14,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -26,8 +27,12 @@ import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import org.controlsfx.control.PropertySheet;
+import org.controlsfx.property.BeanPropertyUtils;
+
 import org.olympe.musicplayer.bean.configurator.PlayerConfigurator;
 import org.olympe.musicplayer.bean.model.Audio;
+import org.olympe.musicplayer.util.BeanPropertyWrapper;
 
 /**
  *
@@ -165,6 +170,17 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
             }
         }
         logger.exiting("MusicPlayerFXMLController", "updateAudio");
+    }
+
+    @Override
+    protected void collectOptions(ObservableList<PropertySheet.Item> options)
+    {
+        logger.entering("MusicPlayerFXMLController", "collectOptions", options);
+        super.collectOptions(options);
+        Stream<PropertySheet.Item> stream = BeanPropertyUtils.getProperties(configurator, this::isValidProperty).stream();
+        stream = stream.map(BeanPropertyWrapper::new);
+        options.addAll(stream.collect(Collectors.toList()));
+        logger.exiting("MusicPlayerFXMLController", "collectOptions");
     }
 
     @Override

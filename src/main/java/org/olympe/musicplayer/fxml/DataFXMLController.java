@@ -85,9 +85,7 @@ public abstract class DataFXMLController<T> extends InternalNotifierFXMLControll
         if (source == addDataButton)
         {
             if (fileChooser == null)
-            {
                 fileChooser = createFileChooser();
-            }
             List<File> files = fileChooser.showOpenMultipleDialog(getStage());
             if (files != null && !files.isEmpty())
             {

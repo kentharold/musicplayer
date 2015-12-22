@@ -2,10 +2,14 @@ package org.olympe.musicplayer.fxml;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -23,19 +27,27 @@ import javafx.scene.input.ZoomEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
+import org.controlsfx.control.PropertySheet;
+import org.controlsfx.property.BeanPropertyUtils;
+
+import org.olympe.musicplayer.bean.configurator.CoreConfigurator;
 import org.olympe.musicplayer.bean.model.Audio;
+import org.olympe.musicplayer.util.BeanPropertyWrapper;
 
 public class DefaultFXMLController extends CoverImageFXMLController
 {
     private static final String FXML_NAME = "fxml/MusicPlayer.fxml";
     private static final String CSS_NAME = "css/default.css";
     private static final String I18N_NAME = "i18n.Messages";
+    private CoreConfigurator configurator;
 
     public DefaultFXMLController(Application application, Stage stage) throws IOException
     {
         super(application, stage);
+        configurator = new CoreConfigurator(getPreferencesNode("core"));
         URL location = ClassLoader.getSystemResource(FXML_NAME);
         FXMLLoader loader = new FXMLLoader(location);
+        Locale.setDefault(configurator.getLanguage().getLocale());
         ResourceBundle resources = ResourceBundle.getBundle(I18N_NAME);
         loader.setResources(resources);
         loader.setController(this);
@@ -44,7 +56,19 @@ public class DefaultFXMLController extends CoverImageFXMLController
         scene.getStylesheets().add(getDefaultStyleSheet());
         stage.setScene(scene);
         stage.setTitle("Olympe Music Player");
+        addExitHandler(configurator::saveToPreferences);
         Platform.runLater(() -> initialize(scene, loader));
+    }
+
+    @Override
+    protected void collectOptions(ObservableList<PropertySheet.Item> options)
+    {
+        logger.entering("DefaultFXMLController", "collectOptions", options);
+        Stream<PropertySheet.Item> stream = BeanPropertyUtils.getProperties(configurator, this::isValidProperty).stream();
+        stream = stream.map(BeanPropertyWrapper::new);
+        options.addAll(stream.collect(Collectors.toList()));
+        super.collectOptions(options);
+        logger.exiting("DefaultFXMLController", "collectOptions");
     }
 
     @Override
