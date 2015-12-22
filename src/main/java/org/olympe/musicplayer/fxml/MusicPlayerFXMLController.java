@@ -244,43 +244,51 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
 
     private void savePlayerState()
     {
-        Preferences prefs = configurator.getPrefs();
-        prefs.putDouble("currentTime", durationSlider.getValue());
-        prefs.putDouble("volume", volumeSlider.getValue());
-        prefs.putBoolean("mute", muteToggleButton.isSelected());
-        prefs.putBoolean("repeatSelected", repeatCheckBox.isSelected());
-        prefs.putBoolean("repeatIndeterminate", repeatCheckBox.isIndeterminate());
-        prefs.putInt("currentIndex", getLoadedIndex());
-        Stream<Audio> audios = getData().stream();
-        Stream<File> files = audios.map(Audio::getFile);
-        Stream<String> pathNames = files.map(File::getAbsolutePath);
-        String dataStr = String.join(File.pathSeparator, pathNames.collect(Collectors.toList()));
-        if (dataStr.isEmpty())
-            dataStr = null;
-        prefs.put("data", dataStr);
+        if (configurator.getRememberPlayerState())
+        {
+            Preferences prefs = configurator.getPrefs();
+            prefs.putDouble("currentTime", durationSlider.getValue());
+            prefs.putDouble("volume", volumeSlider.getValue());
+            prefs.putBoolean("mute", muteToggleButton.isSelected());
+            prefs.putBoolean("repeatSelected", repeatCheckBox.isSelected());
+            prefs.putBoolean("repeatIndeterminate", repeatCheckBox.isIndeterminate());
+            prefs.putInt("currentIndex", getLoadedIndex());
+            Stream<Audio> audios = getData().stream();
+            Stream<File> files = audios.map(Audio::getFile);
+            Stream<String> pathNames = files.map(File::getAbsolutePath);
+            String dataStr = String.join(File.pathSeparator, pathNames.collect(Collectors.toList()));
+            if (dataStr.isEmpty())
+            {
+                dataStr = null;
+            }
+            prefs.put("data", dataStr);
+        }
     }
 
     private void restorePlayerState()
     {
-        Preferences prefs = configurator.getPrefs();
-        volumeSlider.setValue(prefs.getDouble("volume", 0.5));
-        muteToggleButton.setSelected(prefs.getBoolean("mute", false));
-        repeatCheckBox.setSelected(prefs.getBoolean("repeatSelected", false));
-        repeatCheckBox.setIndeterminate(prefs.getBoolean("repeatIndeterminate", false));
-        String dataStr = prefs.get("data", null);
-        if (dataStr != null)
+        if (configurator.getRememberPlayerState())
         {
-            Stream<String> pathNames = Stream.of(dataStr.split(File.pathSeparator));
-            Stream<File> files = pathNames.map(File::new);
-            Stream<Audio> audios = files.map(this::mapDataFromFile);
-            getData().addAll(audios.collect(Collectors.toList()));
-            int index = prefs.getInt("currentIndex", -1);
-            if (index >= 0 && index < getData().size())
+            Preferences prefs = configurator.getPrefs();
+            volumeSlider.setValue(prefs.getDouble("volume", 0.5));
+            muteToggleButton.setSelected(prefs.getBoolean("mute", false));
+            repeatCheckBox.setSelected(prefs.getBoolean("repeatSelected", false));
+            repeatCheckBox.setIndeterminate(prefs.getBoolean("repeatIndeterminate", false));
+            String dataStr = prefs.get("data", null);
+            if (dataStr != null)
             {
-                Audio audio = getData().get(index);
-                loadedIndexProperty().set(index);
-                loadedAudioProperty().set(audio);
-                // currentProgressProperty().set(prefs.getDouble("currentTime", 0.0));
+                Stream<String> pathNames = Stream.of(dataStr.split(File.pathSeparator));
+                Stream<File> files = pathNames.map(File::new);
+                Stream<Audio> audios = files.map(this::mapDataFromFile);
+                getData().addAll(audios.collect(Collectors.toList()));
+                int index = prefs.getInt("currentIndex", -1);
+                if (index >= 0 && index < getData().size())
+                {
+                    Audio audio = getData().get(index);
+                    loadedIndexProperty().set(index);
+                    loadedAudioProperty().set(audio);
+                    // currentProgressProperty().set(prefs.getDouble("currentTime", 0.0));
+                }
             }
         }
     }
