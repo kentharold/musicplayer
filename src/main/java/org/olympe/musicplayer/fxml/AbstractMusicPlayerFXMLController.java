@@ -9,17 +9,13 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.LongProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import static javafx.application.Platform.runLater;
-import static javafx.scene.media.MediaPlayer.Status.PLAYING;
 
 import org.olympe.musicplayer.bean.model.Audio;
 import static org.olympe.musicplayer.bean.model.Audio.getMediaPlayerCache;
@@ -30,7 +26,6 @@ import static org.olympe.musicplayer.bean.model.Audio.getMediaPlayerCache;
 public abstract class AbstractMusicPlayerFXMLController extends AudioListFXMLController
 {
     private IntegerProperty loadedIndex;
-    private ObjectProperty<Audio> loadedAudio;
     private DoubleProperty currentProgress;
     private LongProperty currentDuration;
     private LongProperty totalDuration;
@@ -42,15 +37,13 @@ public abstract class AbstractMusicPlayerFXMLController extends AudioListFXMLCon
         currentDuration = new SimpleLongProperty(this, "currentDuration", 0);
         totalDuration = new SimpleLongProperty(this, "totalDuration", 0);
         currentProgress = new SimpleDoubleProperty(this, "currentProgress", 0);
-        loadedAudio = new SimpleObjectProperty<>(this, "loadedAudio");
-        loadedAudio.addListener(this::updateAudio);
     }
 
     public final void stepForward()
     {
         logger.entering("AbstractMusicPlayerFXMLController", "stepForward");
         stop();
-        step(+1);
+        load(+1);
         setPlay(isPlaySelected());
         logger.exiting("AbstractMusicPlayerFXMLController", "stepForward");
     }
@@ -59,30 +52,9 @@ public abstract class AbstractMusicPlayerFXMLController extends AudioListFXMLCon
     {
         logger.entering("AbstractMusicPlayerFXMLController", "stepBackward");
         stop();
-        step(-1);
+        load(-1);
         setPlay(isPlaySelected());
         logger.entering("AbstractMusicPlayerFXMLController", "stepBackward");
-    }
-
-    public final void stop()
-    {
-        logger.entering("AbstractMusicPlayerFXMLController", "stop");
-        MediaPlayer mediaPlayer = getLoadedMediaPlayer();
-        if (mediaPlayer != null)
-            mediaPlayer.stop();
-        logger.exiting("AbstractMusicPlayerFXMLController", "stop");
-    }
-
-    public final boolean isPlaying()
-    {
-        logger.entering("AbstractMusicPlayerFXMLController", "isPlaying");
-        MediaPlayer mediaPlayer = getLoadedMediaPlayer();
-        MediaPlayer.Status status = null;
-        if (mediaPlayer != null)
-            status = mediaPlayer.getStatus();
-        boolean result = status != null && status == PLAYING;
-        logger.exiting("AbstractMusicPlayerFXMLController", "isPlaying", result);
-        return result;
     }
 
     public final void toggleRepeat()
@@ -101,45 +73,27 @@ public abstract class AbstractMusicPlayerFXMLController extends AudioListFXMLCon
         // players mute property.
     }
 
-    public final void togglePlay()
+    public final void load(int offset)
     {
-        logger.entering("AbstractMusicPlayerFXMLController", "togglePlay");
-        setPlay(!isPlaying());
-        logger.exiting("AbstractMusicPlayerFXMLController", "togglePlay");
-    }
-
-    public final void setPlay(boolean play)
-    {
-        logger.entering("AbstractMusicPlayerFXMLController", "setPlay", play);
-        MediaPlayer mediaPlayer = getLoadedMediaPlayer();
-        if (play)
-            mediaPlayer.play();
-        else
-            mediaPlayer.pause();
-        setPlaySelected(play);
-        logger.exiting("AbstractMusicPlayerFXMLController", "setPlay");
-    }
-
-    public final void step(int offset)
-    {
-        logger.entering("AbstractMusicPlayerFXMLController", "step", offset);
+        logger.entering("AbstractMusicPlayerFXMLController", "load", offset);
         int index = compute(offset);
         loadedIndex.set(index);
         Audio audio = getData().get(index);
-        loadedAudio.set(audio);
-        logger.exiting("AbstractMusicPlayerFXMLController", "step");
+        loadedAudioProperty().set(audio);
+        logger.exiting("AbstractMusicPlayerFXMLController", "load");
     }
 
-    public final void step(Audio audio)
+    @Override
+    public final void load(Audio audio)
     {
-        logger.entering("AbstractMusicPlayerFXMLController", "step", audio);
+        logger.entering("AbstractMusicPlayerFXMLController", "load", audio);
         if (audio != null)
         {
-            loadedAudio.set(audio);
+            loadedAudioProperty().set(audio);
             int index = getData().indexOf(audio);
             loadedIndex.set(index);
         }
-        logger.exiting("AbstractMusicPlayerFXMLController", "step");
+        logger.exiting("AbstractMusicPlayerFXMLController", "load");
     }
 
     public final int getLoadedIndex()
@@ -150,25 +104,6 @@ public abstract class AbstractMusicPlayerFXMLController extends AudioListFXMLCon
     public final IntegerProperty loadedIndexProperty()
     {
         return loadedIndex;
-    }
-
-    public final ObjectProperty<Audio> loadedAudioProperty()
-    {
-        return loadedAudio;
-    }
-
-    public final MediaPlayer getLoadedMediaPlayer()
-    {
-        Audio audio = loadedAudio.get();
-        MediaPlayer player = null;
-        if (audio != null)
-            player = audio.getMediaPlayer();
-        return player;
-    }
-
-    public final Audio getLoadedAudio()
-    {
-        return loadedAudio.get();
     }
 
     public final DoubleProperty currentProgressProperty()
@@ -237,8 +172,6 @@ public abstract class AbstractMusicPlayerFXMLController extends AudioListFXMLCon
         logger.exiting("AbstractMusicPlayerFXMLController", "registerMediaPlayer");
     }
 
-    protected abstract void updateAudio(ObservableValue<? extends Audio> observable, Audio oldValue, Audio newValue);
-
     protected abstract int computeRepeat();
 
     protected abstract DoubleProperty volumeProperty();
@@ -246,8 +179,6 @@ public abstract class AbstractMusicPlayerFXMLController extends AudioListFXMLCon
     protected abstract BooleanProperty muteProperty();
 
     protected abstract boolean isPlaySelected();
-
-    protected abstract void setPlaySelected(boolean b);
 
     protected abstract int compute(int offset);
 

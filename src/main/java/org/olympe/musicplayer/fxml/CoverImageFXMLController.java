@@ -181,6 +181,14 @@ public abstract class CoverImageFXMLController extends MusicPlayerFXMLController
         logger.exiting("CoverImageFXMLController", "collectOptions");
     }
 
+    protected void setThemeColor(Color color)
+    {
+        String styleSheet = getStyleSheet(color, getDefaultStyleSheet());
+        if (styleSheet == null)
+            styleSheet = getDefaultStyleSheet();
+        getStage().getScene().getStylesheets().setAll(styleSheet);
+    }
+
     @Override
     void initialize()
     {
@@ -227,13 +235,5 @@ public abstract class CoverImageFXMLController extends MusicPlayerFXMLController
         if (configurator.getUseCoverPredominantColor() && image != null)
             color = getThemeColor(image);
         setThemeColor(color);
-    }
-
-    private void setThemeColor(Color color)
-    {
-        String styleSheet = getStyleSheet(color, getDefaultStyleSheet());
-        if (styleSheet == null)
-            styleSheet = getDefaultStyleSheet();
-        getStage().getScene().getStylesheets().setAll(styleSheet);
     }
 }

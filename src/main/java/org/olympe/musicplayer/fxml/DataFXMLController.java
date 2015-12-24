@@ -136,7 +136,7 @@ public abstract class DataFXMLController<T> extends InternalNotifierFXMLControll
         logger.entering("DataFXMLController", "createFileChooser");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        fileChooser.setTitle(localize("FileChooser.title"));
+        fileChooser.setTitle(localize("AudioFileChooser.title"));
         List<ExtensionFilter> extFilters = fileChooser.getExtensionFilters();
         registerExtensionFilters(extFilters);
         ExtensionFilter selected = getSelectedExtensionFilter(extFilters);

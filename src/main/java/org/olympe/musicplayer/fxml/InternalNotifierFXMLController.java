@@ -51,7 +51,7 @@ public abstract class InternalNotifierFXMLController extends UndecoratedFXMLCont
     protected void showOptions(PropertySheet sheet)
     {
         logger.entering("InternalNotifierFXMLController", "showOptions", sheet);
-        String title = localize("Options.name");
+        String title = localize("Fxml.Options.name");
         Node graphic = new FontAwesomeIconView(FontAwesomeIcon.COG);
         notify(title, graphic, sheet, ButtonData.CANCEL_CLOSE);
         logger.exiting("InternalNotifierFXMLController", "showOptions");
@@ -178,7 +178,7 @@ public abstract class InternalNotifierFXMLController extends UndecoratedFXMLCont
         logger.entering("InternalNotifierFXMLController", "getOrCreateOkButton");
         if (okButton == null)
         {
-            okButton = new Button(localize("OkButton.name"));
+            okButton = new Button(localize("Notifier.OkButton.name"));
             ButtonBar.setButtonData(okButton, ButtonData.OK_DONE);
             okButton.setOnAction(this::onAction);
         }
@@ -191,7 +191,7 @@ public abstract class InternalNotifierFXMLController extends UndecoratedFXMLCont
         logger.entering("InternalNotifierFXMLController", "getOrCreateCloseButton");
         if (closeButton == null)
         {
-            closeButton = new Button(localize("CloseButton.name"));
+            closeButton = new Button(localize("Notifier.CloseButton.name"));
             ButtonBar.setButtonData(closeButton, ButtonData.CANCEL_CLOSE);
             closeButton.setOnAction(this::onAction);
         }

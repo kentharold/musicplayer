@@ -192,8 +192,11 @@ public abstract class UndecoratedFXMLController extends ConfigurableFXMLControll
     public final void exit(int status)
     {
         logger.entering("UndecoratedFXMLController", "exit", status);
-        exitHandlers.stream().forEach(Runnable::run);
-        getStage().close();
+        if (status == 0)
+        {
+            exitHandlers.stream().forEach(Runnable::run);
+            getStage().close();
+        }
         Platform.exit();
         System.exit(status);
         logger.exiting("UndecoratedFXMLController", "exit");

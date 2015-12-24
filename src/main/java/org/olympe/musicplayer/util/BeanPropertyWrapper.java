@@ -16,10 +16,14 @@ import static org.olympe.musicplayer.fxml.AbstractFXMLController.localize;
 public class BeanPropertyWrapper implements Item
 {
     private final BeanProperty delegateBeanProperty;
+    private final String category;
 
     public BeanPropertyWrapper(Item property)
     {
         this.delegateBeanProperty = (BeanProperty) property;
+        Object bean = delegateBeanProperty.getBean();
+        String className = bean.getClass().getSimpleName();
+        category = className.replaceAll("Configurator", "");
     }
 
     @Override
@@ -31,19 +35,19 @@ public class BeanPropertyWrapper implements Item
     @Override
     public String getCategory()
     {
-        return localize(delegateBeanProperty.getBean().getClass().getSimpleName() + ".name");
+        return localize("Configurator." + category + ".name");
     }
 
     @Override
     public String getName()
     {
-        return localize(delegateBeanProperty.getName() + ".name");
+        return localize("Configurator." + category + "." + delegateBeanProperty.getName() + ".name");
     }
 
     @Override
     public String getDescription()
     {
-        return localize(delegateBeanProperty.getDescription() + ".description");
+        return localize("Configurator." + category + "." + delegateBeanProperty.getDescription() + ".description");
     }
 
     @Override

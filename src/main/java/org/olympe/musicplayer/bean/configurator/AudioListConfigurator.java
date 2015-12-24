@@ -73,7 +73,7 @@ public class AudioListConfigurator extends Configurator
         @Override
         public String toString()
         {
-            return localize(name());
+            return localize("Configurator.AudioList.DisplayMode." + name());
         }
     }
 }

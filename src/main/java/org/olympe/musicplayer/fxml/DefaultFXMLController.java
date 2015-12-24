@@ -34,7 +34,7 @@ import org.olympe.musicplayer.bean.configurator.CoreConfigurator;
 import org.olympe.musicplayer.bean.model.Audio;
 import org.olympe.musicplayer.util.BeanPropertyWrapper;
 
-public class DefaultFXMLController extends CoverImageFXMLController
+public class DefaultFXMLController extends MetadataFXMLController
 {
     private static final String FXML_NAME = "fxml/MusicPlayer.fxml";
     private static final String CSS_NAME = "css/default.css";
@@ -51,7 +51,7 @@ public class DefaultFXMLController extends CoverImageFXMLController
         ResourceBundle resources = ResourceBundle.getBundle(I18N_NAME);
         loader.setResources(resources);
         loader.setController(this);
-        Parent busyNode = new BorderPane(new Label("loading the application"));
+        Parent busyNode = new BorderPane(new Label(localize("Application.PlaceHolder.msg")));
         Scene scene = new Scene(busyNode, 600, 480);
         scene.getStylesheets().add(getDefaultStyleSheet());
         stage.setScene(scene);
@@ -81,11 +81,13 @@ public class DefaultFXMLController extends CoverImageFXMLController
     @Override
     protected void unregisterAudio(Audio audio)
     {
+        super.unregisterAudio(audio);
     }
 
     @Override
     protected void registerAudio(Audio audio)
     {
+        super.registerAudio(audio);
     }
 
     @Override

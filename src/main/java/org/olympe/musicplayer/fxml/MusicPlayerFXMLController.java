@@ -9,6 +9,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.StringBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -17,12 +18,17 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Orientation;
+import javafx.geometry.Point2D;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -30,6 +36,9 @@ import javafx.util.Duration;
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.property.BeanPropertyUtils;
 
+import de.jensd.fx.glyphs.GlyphIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import org.olympe.musicplayer.bean.configurator.PlayerConfigurator;
 import org.olympe.musicplayer.bean.model.Audio;
 import org.olympe.musicplayer.util.BeanPropertyWrapper;
@@ -82,7 +91,7 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
         if (computeRepeat() != 1)
         {
             stop();
-            step(+1);
+            load(+1);
             MediaPlayer mediaPlayer = getLoadedMediaPlayer();
             if (isPlaySelected())
                 mediaPlayer.play();
@@ -129,6 +138,12 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
     protected final DoubleProperty volumeProperty()
     {
         return volumeSlider.valueProperty();
+    }
+
+    @Override
+    protected final ToggleButton getMusicPlayerButton()
+    {
+        return playToggleButton;
     }
 
     @Override
@@ -204,8 +219,95 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
         totalTimeLabel.textProperty().bind(Bindings.format("%1$tM:%1$tS", totalDurationProperty()));
         durationSlider.valueProperty().bindBidirectional(currentProgressProperty());
         currentProgressProperty().addListener(currentProgressChangeListener);
+        Tooltip tooltip = prevButton.getTooltip();
+        StringBinding audioStr = createAudioStringBinding(Bindings.valueAt(getData(), loadedIndexProperty().subtract(1)));
+        tooltip.textProperty().bind(Bindings.format(localize("MediaControl.Prev.descriptionFmt"), audioStr));
+        tooltip = playToggleButton.getTooltip();
+        GlyphIcon tooltipGraphic = (FontAwesomeIconView) tooltip.getGraphic();
+        GlyphIcon graphic = (FontAwesomeIconView) playToggleButton.getGraphic();
+        tooltipGraphic.glyphNameProperty().bind(graphic.glyphNameProperty());
+        audioStr = createAudioStringBinding(loadedAudioProperty());
+        tooltip.textProperty().bind(Bindings.when(playToggleButton.selectedProperty()).then(Bindings.format(localize("MediaControl.Pause.descriptionFmt"), audioStr)).otherwise(Bindings.format(localize("MediaControl.Play.descriptionFmt"), audioStr)));
+        tooltip = nextButton.getTooltip();
+        audioStr = createAudioStringBinding(Bindings.valueAt(getData(), loadedIndexProperty().subtract(-1)));
+        tooltip.textProperty().bind(Bindings.format(localize("MediaControl.Next.descriptionFmt"), audioStr));
+        tooltip = currentTimeLabel.getTooltip();
+        tooltip.textProperty().bind(currentTimeLabel.textProperty());
+        tooltip = totalTimeLabel.getTooltip();
+        tooltip.textProperty().bind(totalTimeLabel.textProperty());
+        tooltip = muteToggleButton.getTooltip();
+        tooltipGraphic = (MaterialDesignIconView) tooltip.getGraphic();
+        graphic = (MaterialDesignIconView) muteToggleButton.getGraphic();
+        tooltipGraphic.glyphNameProperty().bind(graphic.glyphNameProperty());
+        tooltip.textProperty().bind(Bindings.when(muteProperty()).
+                then(localize("MediaControl.Unmute.description")).otherwise(localize("MediaControl.Mute.description")));
+        tooltip = repeatCheckBox.getTooltip();
+        tooltipGraphic = (MaterialDesignIconView) tooltip.getGraphic();
+        graphic = (MaterialDesignIconView) repeatCheckBox.getGraphic();
+        tooltipGraphic.glyphNameProperty().bind(graphic.glyphNameProperty());
+        audioStr = createAudioStringBinding(loadedAudioProperty());
+        tooltip.textProperty().bind(Bindings.when(repeatCheckBox.selectedProperty()).then(localize("MediaControl.DisableRepeat.description")).otherwise(Bindings.when(repeatCheckBox.indeterminateProperty()).then(Bindings.format(localize("MediaControl.RepeatTrack.descriptionFmt"), audioStr)).otherwise(localize("MediaControl.RepeatPlayQueue.description"))));
         Platform.runLater(this::restorePlayerState);
         logger.exiting("MusicPlayerFXMLController", "initialize");
+    }
+
+    @Override
+    void onMouseMoved(MouseEvent event)
+    {
+        super.onMouseMoved(event);
+        if (!event.isConsumed())
+        {
+            Object source = event.getSource();
+            if (source instanceof Slider)
+            {
+                double value = -1;
+                Slider slider = (Slider) source;
+                NumberAxis axis = (NumberAxis) slider.lookup(".axis");
+                StackPane track = (StackPane) slider.lookup(".track");
+                StackPane thumb = (StackPane) slider.lookup(".thumb");
+                boolean useAxis = slider.isShowTickLabels() || slider.isShowTickMarks();
+                if (useAxis)
+                {
+                    // James: use axis to convert value/position
+                    Point2D locationInAxis = axis.sceneToLocal(event.getSceneX(), event.getSceneY());
+                    boolean isHorizontal = slider.getOrientation() == Orientation.HORIZONTAL;
+                    double mouseX = isHorizontal ? locationInAxis.getX() : locationInAxis.getY();
+                    value = axis.getValueForDisplay(mouseX).doubleValue();
+                }
+                else
+                {
+                    // this can't work because we don't know the internals of the track
+                    Point2D locationInAxis = track.sceneToLocal(event.getSceneX(), event.getSceneY());
+                    double mouseX = locationInAxis.getX();
+                    double trackLength = track.getWidth();
+                    double percent = mouseX / trackLength;
+                    value = slider.getMin() + ((slider.getMax() - slider.getMin()) * percent);
+                }
+                if (value >= slider.getMin() && value <= slider.getMax())
+                {
+                    Tooltip tooltip = slider.getTooltip();
+                    tooltip.setText(null);
+                    String key = null;
+                    if (slider == volumeSlider)
+                    {
+                        key = "MediaControl.Volume.descriptionFmt";
+                        value *= 100;
+                        tooltip.setText(String.format(localize(key), value));
+                    }
+                    else if (slider == durationSlider)
+                    {
+                        key = "MediaControl.Duration.descriptionFmt";
+                        long time = (long) ((value / 100) * totalDurationProperty().get());
+                        tooltip.setText(String.format(localize(key), time));
+                        // FIXME: 24.12.2015 The time display is not the same when cliked on it.
+                    }
+                    if (key != null)
+                    {
+                        event.consume();
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -241,28 +343,14 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
             toggleRepeat();
             event.consume();
         }
-        else if (source instanceof ListCell)
-        {
-            ListCell listCell = (ListCell) source;
-            Object obj = listCell.getItem();
-            if (obj instanceof Audio)
-            {
-                stop();
-                Audio audio = (Audio) obj;
-                step(audio);
-                if (isPlaySelected())
-                    audio.getMediaPlayer().play();
-            }
-            event.consume();
-        }
         logger.entering("MusicPlayerFXMLController", "onAction");
     }
 
     private void savePlayerState()
     {
+        Preferences prefs = configurator.getPrefs();
         if (configurator.getRememberPlayerState())
         {
-            Preferences prefs = configurator.getPrefs();
             prefs.putDouble("currentTime", durationSlider.getValue());
             prefs.putDouble("volume", volumeSlider.getValue());
             prefs.putBoolean("mute", muteToggleButton.isSelected());
@@ -273,10 +361,6 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
             Stream<File> files = audios.map(Audio::getFile);
             Stream<String> pathNames = files.map(File::getAbsolutePath);
             String dataStr = String.join(File.pathSeparator, pathNames.collect(Collectors.toList()));
-            if (dataStr.isEmpty())
-            {
-                dataStr = null;
-            }
             prefs.put("data", dataStr);
         }
     }
@@ -291,7 +375,7 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
             repeatCheckBox.setSelected(prefs.getBoolean("repeatSelected", false));
             repeatCheckBox.setIndeterminate(prefs.getBoolean("repeatIndeterminate", false));
             String dataStr = prefs.get("data", null);
-            if (dataStr != null)
+            if (dataStr != null && !dataStr.isEmpty())
             {
                 Stream<String> pathNames = Stream.of(dataStr.split(File.pathSeparator));
                 Stream<File> files = pathNames.map(File::new);

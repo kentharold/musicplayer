@@ -1,209 +1,273 @@
 .root {
-    /* an alternative is #CCCCCC*/
-    -fx-base: #deaddc;
-    -fx-color: -fx-base;
-    -fx-background: derive(-fx-base, 10%);
+    -fx-base: #cccccc;
+    -fx-dark-text-color: derive(-fx-base, -100%);
+    -fx-mid-text-color: derive(-fx-base, -50%);
+    -fx-light-text-color: derive(-fx-base, 80%);
+    -fx-accent: derive(-fx-base, 25%);
+    -fx-selection-bar: transparent;
+    -fx-selection-bar-non-focused: derive(-fx-accent, -5%);
     -fx-focus-color: derive(-fx-base, 50%);
-    /*-fx-background-image: url("../gfx/pattern.jpg");*/
-    -fx-background-position: center;
-    -fx-background-repeat: no-repeat;
-    -fx-background-size: stretch;
+    -fx-faint-focus-color: transparent;
+    -fx-fill: -fx-text-fill;
 }
 
-.control-button {
+#extraView .tab-label,
+.glyph-button {
     -fx-content-display: graphic-only;
-    -fx-background-color: none;
+    -fx-background-color: transparent;
 }
 
-.glyph-icon {
-    -glyph-size: 16px;
-    -fx-fill: derive(-fx-base, -50%);
+.glyph-button > .glyph-icon {
+    -glyph-size: 20px;
 }
 
-.control-button:hover .glyph-icon {
+#extraView .tab:hover .tab-label .glyph-icon,
+.glyph-button:hover > .glyph-icon {
+    -fx-fill: -fx-hover-base;
     -fx-stroke: -fx-focus-color;
 }
 
-.control-button:armed .glyph-icon {
-    -fx-fill: derive(-fx-base, -10%);
+#extraView .tab:pressed .tab-label .glyph-icon,
+.glyph-button:pressed > .glyph-icon {
+    -fx-fill: -fx-pressed-base
 }
 
-.control-checkbox .box {
-    visibility: false;
-}
-
-#play-button .glyph-icon {
+#play-button > .glyph-icon,
+#play-button .tool-tip > .glyph-icon {
     -glyph-size: 32px;
     -glyph-name: PLAY_CIRCLE;
 }
 
-#play-button:selected .glyph-icon {
+#play-button:selected > .glyph-icon {
     -glyph-name: PAUSE_CIRCLE;
 }
 
-#volume-button .glyph-icon {
+#volume-button > .glyph-icon {
     -glyph-name: VOLUME_OFF;
 }
 
-#volume-button:selected .glyph-icon {
+#volume-button:selected > .glyph-icon {
     -glyph-name: VOLUME_HIGH;
 }
 
-#repeat-checkbox .glyph-icon {
+#repeat-checkbox > .glyph-icon {
     -glyph-name: REPEAT_OFF;
+    -fx-translate-x: -16px;
 }
 
-#repeat-checkbox:selected .glyph-icon {
+#repeat-checkbox:selected > .glyph-icon {
     -glyph-name: REPEAT_ONCE;
 }
 
-#repeat-checkbox:indeterminate .glyph-icon {
+#repeat-checkbox:indeterminate > .glyph-icon {
     -glyph-name: REPEAT;
 }
 
-#shuffle-button .glyph-icon {
+#repeat-checkbox .box,
+#repeat-checkbox .mark {
+    -fx-background-color: transparent;
+}
+
+#shuffle-button > .glyph-icon,
+#shuffle-button:selected > .glyph-icon {
     -glyph-name: SHUFFLE;
 }
 
-#shuffle-button:selected .glyph-icon {
-    -glyph-name: SHUFFLE;
-}
-
-.container {
-}
-
-.container .container-bg {
-    -fx-opacity: 30%;
-    -fx-background-color: derive(-fx-background, 85%);
+.container > .container-bg {
+    -fx-opacity: 25%;
+    -fx-background-color: derive(-fx-background, 75%);
     -fx-background-radius: 10;
 }
 
-.label, .label .glyph-icon, .list-cell {
-    -fx-blend-mode: hard-light;
-    -fx-text-fill: derive(-fx-base, -50%);
-    -fx-fill: derive(-fx-base, -50%);
+.audio-list-view,
+.audio-list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-text-background-color;
 }
 
-.list-cell {
-    -fx-max-width: 100;
-}
-
-.list-view,
-.scroll-bar,
-.label,
-.label .glyph-icon,
-.list-cell {
-    -fx-blend-mode: multiply;
-    -fx-background-color: none;
-}
-
-.scroll-bar .decrement-button,
-.scroll-bar .decrement-button .decrement-arrow,
-.scroll-bar .increment-button,
-.scroll-bar .increment-button .increment-arrow,
-.scroll-bar .track,
-.list-view .virtual-flow .corner {
+.audio-list-cell .glyph-button {
     visibility: hidden;
-    -fx-background-color: none;
 }
 
-.audio-list-cell:loaded {
-    -fx-background-color: derive(-fx-base, 20%);
-    -fx-font-weight: bold;
-    -fx-blend-mode: multiply;
-}
-
-.audio-list-cell:selected {
-    -fx-background-color: -fx-focus-color;
-}
-
-.audio-list-cell:hover {
+.audio-list-cell:filled:hover {
     -fx-background-color: derive(-fx-focus-color, 70%);
 }
 
-.tab-pane .tab-header-area .tab-header-background {
-    -fx-background-color: none;
+.audio-list-cell:selected {
+    -fx-background-color: derive(-fx-focus-color, -10%);
 }
 
-.tab-pane .tab-header-area {
-    -fx-padding: 5px;
+.audio-list-cell:loaded .glyph-button,
+.audio-list-cell:hover .glyph-button {
+    visibility: visible;
 }
 
-.tab {
-    -fx-background-radius: inherit;
-    -fx-padding: inherit;
-    -fx-background-color: inherit;
-    -fx-background-insets: inherit;
+.audio-list-cell:hover .glyph-icon,
+.audio-list-cell:loaded:hover .glyph-icon {
+    -glyph-name: PLAY_CIRCLE;
 }
 
-.tab .tab-label {
-    -fx-content-display: graphic-only;
+.audio-list-cell:hover .glyph-button:selected .glyph-icon,
+.audio-list-cell:loaded:hover .glyph-button:selected .glyph-icon {
+    -glyph-name: PAUSE_CIRCLE;
 }
 
-.tab-pane .tab-label .glyph-icon {
+.audio-list-cell:loaded .glyph-icon {
+    -glyph-name: MUSIC;
+}
+
+#metadata-view {
+    -fx-background-color: transparent;
+    -fx-table-cell-border-color: transparent;
+    -fx-table-header-border-color: transparent;
+    -fx-control-inner-background: transparent;
+    -fx-control-inner-background-alt: transparent;
+}
+
+#metadata-view .text-field-table-cell {
+    -fx-background: derive(-fx-base, 26.4%);
+}
+
+.table-row-cell,
+#metadata-view .column-header-background {
+    -fx-background-color: transparent;
+}
+
+#metadata-view .column-header,
+#metadata-view .filler {
+    -fx-background-color: transparent;
+    visibility: hidden;
+}
+
+#extraView .tab-label .glyph-icon {
     -glyph-size: 24px;
 }
 
-.tab:hover .tab-label .glyph-icon {
-    -fx-stroke: -fx-focus-color;
+#extraView .tab:selected .tab-label .glyph-icon {
+    -fx-fill: derive(-fx-focus-color, -10%);
 }
 
-.tab:selected .tab-label .glyph-icon {
-    -fx-fill: derive(-fx-base, -10%);
+/*******************************************************************************
+ *                                                                             *
+ * TabPane                                                                     *
+ *                                                                             *
+ ******************************************************************************/
+
+.tab-pane {
+    -fx-tab-min-height: 2.5em;
+    -fx-tab-max-height: 2.5em;
 }
 
-.tab:pressed .tab-label .glyph-icon {
-    -fx-fill: derive(-fx-base, 10%);
+.tab-pane > .tab-header-area > .headers-region > .tab > .tab-container > .tab-label {
+    -fx-alignment: CENTER;
+    -fx-text-fill: -fx-text-base-color;
 }
 
-.table-view {
-    -fx-background-color: transparent;
-    -fx-control-inner-background: none;
-    -fx-table-cell-border-color: transparent;
-    -fx-table-header-border-color: transparent;
-}
-
-.table-row-cell, .table-row-cell:selected, .table-row-cell:filled {
-    -fx-background-color: none;
+.tab-pane > .tab-header-area > .headers-region > .tab {
     -fx-background-insets: none;
-    -fx-padding: 0;
+    -fx-background-radius: none;
+    -fx-padding: 1.2em 1.2em 1.2em 1.2em;
 }
 
-.table-row-cell:selected .table-cell {
-    -fx-background-color: none;
-    -fx-padding: 0;
+.tab-pane > .tab-header-area > .headers-region > .tab:top {
+    -fx-background-color: transparent;
 }
 
-*.table-row-cell, *.table-cell {
-    -fx-blend-mode: hard-light;
-    -fx-text-fill: derive(-fx-base, -50%);
-    -fx-fill: derive(-fx-base, -50%);
-    -fx-padding: 0;
+.tab-pane > .tab-header-area > .headers-region > .tab:hover {
+    -fx-color: -fx-hover-base;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected {
+    -fx-background-color: transparent;
+    -fx-background-insets: none;
+}
+
+.tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
     -fx-border-width: 0;
+    -fx-border-color: transparent;
+    -fx-border-insets: none;
+    -fx-border-radius: 0;
 }
 
-.table-row-cell {
-    -fx-blend-mode: multiply;
+.tab-pane > .tab-header-area > .tab-header-background {
+    -fx-background-color: transparent;
 }
 
-.table-view .column-header-background {
-    -fx-background-color: none;
+.tab-pane:top > .tab-header-area > .tab-header-background {
+    -fx-background-insets: none;
 }
 
-.table-view .column-header, .table-view .filler {
-    visibility: hidden;
-    -fx-background-color: none;
+.tab-pane:top > .tab-header-area {
+    -fx-padding: 0;
 }
 
-.busy {
-    -fx-background-color: derive(-fx-base, -50%);
+.tab-pane > .tab-header-area > .headers-region > .tab > .tab-container > .tab-close-button {
+    -fx-background-color: -fx-mark-color;
+    -fx-shape: "M 0,0 H1 L 4,3 7,0 H8 V1 L 5,4 8,7 V8 H7 L 4,5 1,8 H0 V7 L 3,4 0,1 Z";
+    -fx-scale-shape: false;
+    -fx-effect: dropshadow(two-pass-box, rgba(255, 255, 255, 0.4), 1, 0.0, 0, 1);
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab > .tab-container > .tab-close-button:hover {
+    -fx-background-color: derive(-fx-mark-color, -30%);
+}
+
+.tab-pane > .tab-header-area > .control-buttons-tab > .container {
+    -fx-padding: 0;
+}
+
+.tab-pane > .tab-header-area > .control-buttons-tab > .container > .tab-down-button {
+    -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-body-color;
+    -fx-background-insets: -1 0 5 0, 0 1 6 1, 1 2 7 2;
+    -fx-padding: 4 4 9 4;
+    -fx-background-radius: 10;
+}
+
+.tab-pane:bottom > .tab-header-area > .control-buttons-tab > .container > .tab-down-button {
+    -fx-padding: -5 4 4 4; /* TODO convert to ems */
+}
+
+/* FLOATING TABS CUSTOMISATION */
+.tab-pane.floating > .tab-header-area > .tab-header-background {
+    -fx-background-color: null;
+}
+
+.tab-pane.floating > .tab-header-area {
+    -fx-background-color: null;
+}
+
+.tab-pane.floating > .tab-content-area {
+    -fx-background-color: -fx-outer-border, -fx-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 2, 0;
+    -fx-padding: 2;
+}
+
+/*
+ *   Overlay Busy Pane
+ */
+
+#overlay-pane .dialog-pane {
+    -fx-background-radius: 10;
+}
+
+#overlay-pane .busy {
+    -fx-background-color: -fx-background;
     -fx-opacity: 60%;
 }
 
-.dialog-pane {
-    -fx-background-color: derive(-fx-base, -70%);
+#overlay-title {
+    -fx-font-weight: bold;
+    -fx-graphic-text-gap: 10px;
 }
 
-.tooltip {
-    -fx-wrap-text: true;
+#overlay-title .glyph-icon {
+    -glyph-size: 24px;
+}
+
+/*
+ *   Property Sheet
+ */
+
+.property-sheet .clearable-field {
 }

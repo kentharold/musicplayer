@@ -86,9 +86,7 @@ public abstract class ConfigurableFXMLController extends AbstractFXMLController
     void initialize()
     {
         logger.entering("ConfigurableFXMLController", "initialize");
-        optionsButton.disableProperty().bind(Bindings.isEmpty(options));
-        optionsButton.visibleProperty().bind(Bindings.isNotEmpty(options).and(optionsViewVisible().not()));
-        optionsButton.managedProperty().bind(Bindings.isNotEmpty(options).and(optionsViewVisible().not()));
+        optionsButton.disableProperty().bind(Bindings.isEmpty(options).or(optionsViewVisible()));
         logger.exiting("ConfigurableFXMLController", "initialize");
     }
 

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.application.Application;
+import javafx.beans.binding.DoubleBinding;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Orientation;
@@ -48,6 +49,13 @@ public abstract class ListViewFXMLController<T> extends DataFXMLController<T>
         return result;
     }
 
+    protected final void listCellWidthUpdater(ListCell listCell)
+    {
+        DoubleBinding listCellWidth = dataView.widthProperty().subtract(20);
+        listCell.prefWidthProperty().bind(listCellWidth);
+        listCell.maxWidthProperty().bind(listCellWidth);
+    }
+
     protected abstract Node createPlaceholder();
 
     protected abstract Callback<ListView<T>, ListCell<T>> createCellFactoryFor(ListView<T> listView);
@@ -57,6 +65,7 @@ public abstract class ListViewFXMLController<T> extends DataFXMLController<T>
     {
         logger.entering("ListViewFXMLController", "initialize");
         super.initialize();
+        dataView.getStyleClass().add("audio-list-view");
         dataView.setPlaceholder(createPlaceholder());
         dataView.setCellFactory(createCellFactoryFor(dataView));
         dataView.setEditable(false);
