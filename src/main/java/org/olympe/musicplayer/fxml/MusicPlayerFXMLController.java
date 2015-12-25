@@ -246,7 +246,8 @@ public abstract class MusicPlayerFXMLController extends AbstractMusicPlayerFXMLC
         graphic = (MaterialDesignIconView) repeatCheckBox.getGraphic();
         tooltipGraphic.glyphNameProperty().bind(graphic.glyphNameProperty());
         audioStr = createAudioStringBinding(loadedAudioProperty());
-        tooltip.textProperty().bind(Bindings.when(repeatCheckBox.selectedProperty()).then(localize("MediaControl.DisableRepeat.description")).otherwise(Bindings.when(repeatCheckBox.indeterminateProperty()).then(Bindings.format(localize("MediaControl.RepeatTrack.descriptionFmt"), audioStr)).otherwise(localize("MediaControl.RepeatPlayQueue.description"))));
+        StringBinding b = Bindings.when(loadedAudioProperty().isNull()).then(localize("MediaControl.RepeatEmptyTrack.description")).otherwise(Bindings.format(localize("MediaControl.RepeatTrack.descriptionFmt"), audioStr));
+        tooltip.textProperty().bind(Bindings.when(repeatCheckBox.selectedProperty()).then(localize("MediaControl.DisableRepeat.description")).otherwise(Bindings.when(repeatCheckBox.indeterminateProperty()).then(b).otherwise(localize("MediaControl.RepeatPlayQueue.description"))));
         Platform.runLater(this::restorePlayerState);
         logger.exiting("MusicPlayerFXMLController", "initialize");
     }
