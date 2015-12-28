@@ -16,7 +16,6 @@ import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.tag.id3.AbstractID3Tag;
 
 import org.olympe.musicplayer.fxml.DefaultFXMLController;
-import sun.util.logging.PlatformLogger;
 
 public class MusicPlayerApplication extends Application
 {
@@ -36,7 +35,6 @@ public class MusicPlayerApplication extends Application
         Stream<Logger> stream = Stream.of(loggerNames).map(Logger::getLogger);
         loggerList.addAll(stream.collect(Collectors.toList()));
         loggerList.parallelStream().forEach(this::applyDefaultLevel);
-        PlatformLogger.getLogger("java.util.prefs").setLevel(PlatformLogger.Level.SEVERE);
     }
 
     @Override
