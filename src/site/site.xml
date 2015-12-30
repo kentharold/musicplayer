@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Olympe Music Player">
+    <skin>
+        <groupId>lt.velykis.maven.skins</groupId>
+        <artifactId>reflow-maven-skin</artifactId>
+        <version>1.1.1</version>
+    </skin>
+    <!--<bannerLeft>
+        <name><![CDATA[
+      <span style="color: #deaddc;">Olympe</span> Music Player
+      ]]>
+        </name>
+        <href>${project.url}</href>
+    </bannerLeft>-->
+    <publishDate position="none"/>
+    <version position="none"/>
+    <body>
+        <links>
+            <item name="Download" href="download.html"/>
+            <item name="Source Code" href="source.html"/>
+            <item name="Tutorials" href="tutorials.html"/>
+            <item name="Contribute" href="contribute.html"/>
+        </links>
+
+        <breadcrumbs>
+            <item name="Olympe Music Player" href="/"/>
+        </breadcrumbs>
+
+        <menu name="Overview" inherit="top">
+            <item name="Home" href="./"/>
+            <item name="Release Notes" href="release-notes.html"/>
+            <item name="General Information" href="about.html"/>
+            <item name="Road Map" href="roadmap.html"/>
+        </menu>
+        <menu name="Download" inherit="top">
+            <item name="Download" href="download.html"/>
+            <item name="Source Code" href="source.html"/>
+            <item name="License" href="license.html"/>
+        </menu>
+        <menu name="Contribute" inherit="bottom">
+            <item name="Contribute" href="contribute.html"/>
+            <item name="Issues" href="issues.html"/>
+            <item name="Fork Project" href="#"/>
+        </menu>
+        <menu name="Documentation" inherit="bottom">
+            <item name="Installation" href="installation"/>
+            <item name="Tutorials" href="tutorials.html"/>
+            <item name="User Guide" href="userguide.html"/>
+        </menu>
+        <menu name="Maven Documentation" ref="reports" inherit="bottom"/>
+    </body>
+    <custom>
+        <reflowSkin>
+            <theme>default</theme>
+            <highlightJs>true</highlightJs>
+            <protocolRelativeURLs>false</protocolRelativeURLs>
+            <smoothScroll>true</smoothScroll>
+            <highlightJsTheme>github</highlightJsTheme>
+            <absoluteResourceURL>http://localhost:63342/org.olympe.musicplayer/target/site/</absoluteResourceURL>
+            <brand>
+                <name><![CDATA[
+          <span style="color: #deaddc;">Olympe</span> Music Player
+          ]]></name>
+                <href>${project.url}</href>
+            </brand>
+            <titleTemplate>%2$s | %1$s</titleTemplate>
+            <!--<toc>top</toc>-->
+            <topNav></topNav>
+            <toc>top</toc>
+            <tocTopMax>10</tocTopMax>
+            <bottomNav maxSpan="12">
+                <column>Overview</column>
+                <column>Download</column>
+                <column>Documentation</column>
+                <column>Contribute</column>
+                <column>reports</column>
+            </bottomNav>
+            <pages>
+                <index>
+                    <titleTemplate>Olympe Music Player</titleTemplate>
+                    <breadcrumbs>false</breadcrumbs>
+                    <toc>false</toc>
+                    <markPageHeader>false</markPageHeader>
+                    <sections>
+                        <carousel/>
+                        <columns>3</columns>
+                    </sections>
+                </index>
+            </pages>
+        </reflowSkin>
+    </custom>
+</project>
