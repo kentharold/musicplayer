@@ -1,1 +1,3 @@
-mvn package
+language: java
+jdk:
+  - oraclejdk8
