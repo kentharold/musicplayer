@@ -1,1 +1,10 @@
 language: java
+
+jdk:
+  - oraclejdk8
+
+notifications:
+  email:
+    - mbatchakwe.kentharold@gmail.com
+
+script: mvn clean install
