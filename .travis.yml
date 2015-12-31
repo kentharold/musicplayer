@@ -13,3 +13,7 @@ before_script:
 script: mvn clean validate compile test package verify install
 
 after_script: mvn deploy
+
+os:
+  - linux
+  - osx
