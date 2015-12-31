@@ -10,4 +10,6 @@ notifications:
 before_script:
   sudo apt-get update && sudo apt-get install oracle-java8-installer
 
-script: mvn clean install
+script: mvn clean validate compile test package verify install
+
+after_script: mvn deploy
