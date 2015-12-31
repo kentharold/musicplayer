@@ -17,7 +17,7 @@
     <body>
         <links>
             <item name="Download" href="download.html"/>
-            <item name="Source Code" href="source.html"/>
+            <item name="Source Code" href="source-repository.html"/>
             <item name="Tutorials" href="tutorials.html"/>
             <item name="Contribute" href="contribute.html"/>
         </links>
@@ -29,12 +29,10 @@
         <menu name="Overview" inherit="top">
             <item name="Home" href="./"/>
             <item name="Release Notes" href="release-notes.html"/>
-            <item name="General Information" href="about.html"/>
-            <item name="Road Map" href="roadmap.html"/>
         </menu>
         <menu name="Download" inherit="top">
             <item name="Download" href="download.html"/>
-            <item name="Source Code" href="source.html"/>
+            <item name="Source Code" href="source-repository.html"/>
             <item name="License" href="license.html"/>
         </menu>
         <menu name="Contribute" inherit="bottom">
