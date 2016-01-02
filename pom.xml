@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.olympe</groupId>
     <artifactId>musicplayer</artifactId>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
     <name>Olympe Music Player</name>
     <description>A simple to use but good looking music player.</description>
     <url>https://github.com/kentharold/musicplayer</url>
@@ -248,7 +247,8 @@
         <connection>scm:git:git@github.com:kentharold/musicplayer.git</connection>
         <url>scm:git:git@github.com:kentharold/musicplayer.git</url>
         <developerConnection>scm:git:git@github.com:kentharold/musicplayer.git</developerConnection>
-    </scm>
+      <tag>HEAD</tag>
+  </scm>
     <issueManagement>
         <system>GitHub</system>
         <url>https://github.com/kentharold/musicplayer/issues</url>
