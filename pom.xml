@@ -58,11 +58,10 @@
                     <identifier>org.olympe.musicplayer</identifier>
                     <needShortcut>true</needShortcut>
                     <needMenu>true</needMenu>
-                    <!--<jfxAppOutputDir>${project.build.directory}/site/downloads/${project.version}/app</jfxAppOutputDir>
+                    <jfxAppOutputDir>${project.build.directory}/site/downloads/${project.version}/app</jfxAppOutputDir>
                     <jfxMainAppJarName>${project.artifactId}.jar</jfxMainAppJarName>
-                    <nativeOutputDir>${project.build.directory}/site/downloads/${project.version}/${OS_SHORT_NAME}
-                    </nativeOutputDir>-->
-                    <appName>${project.artifactId}</appName>
+                    <nativeOutputDir>${project.build.directory}/site/downloads/${project.version}</nativeOutputDir>
+                    <appName>${project.artifactId}-${OS_SHORT_NAME}-installer</appName>
                     <nativeReleaseVersion>${project.version}</nativeReleaseVersion>
                 </configuration>
                 <executions>
@@ -239,6 +238,7 @@
                         <descriptor>src/assembly/bin.xml</descriptor>
                         <descriptor>src/assembly/${OS_SHORT_NAME}/bin.xml</descriptor>
                     </descriptors>
+                    <outputDirectory>${project.build.directory}/site/downloads/${project.version}</outputDirectory>
                 </configuration>
             </plugin>
         </plugins>
