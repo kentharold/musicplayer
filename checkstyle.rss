@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<rss version="0.91">
+  <channel>
+    <title>Olympe Music Player - Checkstyle report</title>
+    <link>https://github.com/kentharold/musicplayer</link>
+    <description>Olympe Music Player - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2016 Olympe</copyright>
+    <item>
+      <title>File: 33,
+             Errors: 1839,
+             Warnings: 0,
+             Infos: 0
+      </title>
+            <link>https://github.com/kentharold/musicplayer/checkstyle.html</link>
+      <description>
+        <p>Click <a href="https://github.com/kentharold/musicplayer/checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.fxml.MusicPlayerFXMLController.java">org/olympe/musicplayer/fxml/MusicPlayerFXMLController.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  151
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.fxml.MetadataFXMLController.java">org/olympe/musicplayer/fxml/MetadataFXMLController.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  72
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#de.androidpit.colorthief.ColorThief.java">de/androidpit/colorthief/ColorThief.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  104
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.fxml.UndecoratedFXMLController.java">org/olympe/musicplayer/fxml/UndecoratedFXMLController.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  187
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#i18n.Messages_de.properties">i18n/Messages_de.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  6
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.util.BeanPropertyWrapper.java">org/olympe/musicplayer/util/BeanPropertyWrapper.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  27
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.util.MusicFileTag.java">org/olympe/musicplayer/util/MusicFileTag.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  20
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.fxml.DefaultFXMLController.java">org/olympe/musicplayer/fxml/DefaultFXMLController.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  110
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.bean.configurator.WindowConfigurator.java">org/olympe/musicplayer/bean/configurator/WindowConfigurator.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  20
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.bean.configurator.Configurator.java">org/olympe/musicplayer/bean/configurator/Configurator.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  11
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#de.androidpit.colorthief.MMCQ.java">de/androidpit/colorthief/MMCQ.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  226
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.bean.configurator.CoreConfigurator.java">org/olympe/musicplayer/bean/configurator/CoreConfigurator.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  34
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#i18n.Messages_en.properties">i18n/Messages_en.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  6
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.bean.model.Audio.java">org/olympe/musicplayer/bean/model/Audio.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  56
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.fxml.AudioListFXMLController.java">org/olympe/musicplayer/fxml/AudioListFXMLController.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  149
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.fxml.CoverImageFXMLController.java">org/olympe/musicplayer/fxml/CoverImageFXMLController.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  92
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.fxml.ListViewFXMLController.java">org/olympe/musicplayer/fxml/ListViewFXMLController.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  55
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.bean.configurator.PlayerConfigurator.java">org/olympe/musicplayer/bean/configurator/PlayerConfigurator.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  19
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#i18n.Messages_fr.properties">i18n/Messages_fr.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  6
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.bean.configurator.AppearanceConfigurator.java">org/olympe/musicplayer/bean/configurator/AppearanceConfigurator.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  36
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.fxml.AbstractExtraFXMLController.java">org/olympe/musicplayer/fxml/AbstractExtraFXMLController.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  10
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.MusicPlayerApplication.java">org/olympe/musicplayer/MusicPlayerApplication.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  18
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.util.TikaFileTypeDetector.java">org/olympe/musicplayer/util/TikaFileTypeDetector.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  7
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.bean.configurator.AudioListConfigurator.java">org/olympe/musicplayer/bean/configurator/AudioListConfigurator.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  38
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.util.TagFileNameStringConverter.java">org/olympe/musicplayer/util/TagFileNameStringConverter.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  15
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.fxml.DataFXMLController.java">org/olympe/musicplayer/fxml/DataFXMLController.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  51
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.util.AudioStringConverter.java">org/olympe/musicplayer/util/AudioStringConverter.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  39
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.util.FileNameStringConverter.java">org/olympe/musicplayer/util/FileNameStringConverter.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  9
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.fxml.ConfigurableFXMLController.java">org/olympe/musicplayer/fxml/ConfigurableFXMLController.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  36
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.fxml.AbstractFXMLController.java">org/olympe/musicplayer/fxml/AbstractFXMLController.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  70
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.fxml.InternalNotifierFXMLController.java">org/olympe/musicplayer/fxml/InternalNotifierFXMLController.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  79
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#i18n.Messages.properties">i18n/Messages.properties</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/kentharold/musicplayer/checkstyle.html#org.olympe.musicplayer.fxml.AbstractMusicPlayerFXMLController.java">org/olympe/musicplayer/fxml/AbstractMusicPlayerFXMLController.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  79
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+
