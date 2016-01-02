@@ -58,10 +58,10 @@
                     <identifier>org.olympe.musicplayer</identifier>
                     <needShortcut>true</needShortcut>
                     <needMenu>true</needMenu>
-                    <jfxAppOutputDir>${project.build.directory}/site/downloads/${project.version}/app</jfxAppOutputDir>
+                    <!--<jfxAppOutputDir>${project.build.directory}/site/downloads/${project.version}/app</jfxAppOutputDir>
                     <jfxMainAppJarName>${project.artifactId}.jar</jfxMainAppJarName>
-                    <nativeOutputDir>${project.build.directory}/site/downloads/${project.version}/${os.name}
-                    </nativeOutputDir>
+                    <nativeOutputDir>${project.build.directory}/site/downloads/${project.version}/${OS_SHORT_NAME}
+                    </nativeOutputDir>-->
                     <appName>${project.artifactId}</appName>
                     <nativeReleaseVersion>${project.version}</nativeReleaseVersion>
                 </configuration>
@@ -228,6 +228,17 @@
                 <configuration>
                     <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo
                     </altDeploymentRepository>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/bin.xml</descriptor>
+                        <descriptor>src/assembly/${OS_SHORT_NAME}/bin.xml</descriptor>
+                    </descriptors>
                 </configuration>
             </plugin>
         </plugins>
